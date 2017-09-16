@@ -1,46 +1,65 @@
-# -*- coding: utf-8 -*-
 import logging
-import logging.handlers
 from telegram import (ReplyKeyboardMarkup, ReplyKeyboardRemove, ParseMode, InlineKeyboardButton,
                     InlineKeyboardMarkup, ParseMode)
 from telegram.ext import (Updater, ConversationHandler, RegexHandler, CommandHandler, MessageHandler,
                         Filters, CallbackQueryHandler)
+from telegram.error import (TelegramError, Unauthorized, BadRequest,
+                            TimedOut, ChatMigrated, NetworkError)
+from telegram.ext.dispatcher import run_async
 from wallet import wallet as w
 from trade import trade as t
 from instruments import instruments as i
 import router
-import bitcoin
+from bitcoin import transfer
 import gettext
+import texts
+from database import users
+from ast import literal_eval
+
 
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO)
-logger = logging.getLogger()
-logger.setLevel(logging.DEBUG)
+logger = logging.getLogger('Main')
+logger.setLevel(logging.INFO)
 
-MENU, ADDRESS_INPUT = range(2)
+MENU, WITHDRAW = range(2)
 
-menu_keyboard = [['💰 Wallet', '📊 Exchange'], ['ℹ About us', '🔩 Settings']]
+menu_keyboard = [['💰 Кошелек', '📊 Купить/продать BTC'], ['ℹ О сервисе', '🔩 Настройки']]
+
+
+def error_callback(bot, update, error):
+    try:
+        raise error
+    except Exception as e:
+        print (e)
+
 
 def start(bot, update, user_data):
     #user_data['ru'] = gettext.translation('messages', localedir='./locale', languages=['ru'])
     #user_data['en'] = gettext.translation('messages', localedir='./locale', languages=['en'])
     #user_data['lang'] = gettext.gettext
     #gettext.install('messages', './locale')
+    message = texts.start_
 
-    message = "Hello, welcome to BTC-change bot. It's a p2p change bot with Escrow service, so that we guarantee safety of your funds"
+    #print (literal_eval(update.message.from_user.to_json()))
+    users.register_user(literal_eval(update.message.from_user.to_json()))
+
 
     update.message.reply_text(message, reply_markup=ReplyKeyboardMarkup(menu_keyboard))
 
     return MENU
 
-def cancel(bot, update):
-    update.message.reply_text('Cancelled')
+
+def cancel(bot, update, user_data):
+    user_data.clear()
+    update.message.reply_text(texts.canceled_, reply_markup=ReplyKeyboardMarkup(menu_keyboard))
     return MENU
 
 
 def main():
-    updater = Updater(token='383099020:AAG_L-5NahITmUTdJoYTSWMBX7n5561Pa8I')
+    updater = Updater(token='383099020:AAG_L-5NahITmUTdJoYTSWMBX7n5561Pa8I',workers=32)
     dispatcher = updater.dispatcher
 
+    dispatcher.add_error_handler(error_callback)
 
     main_menu = ConversationHandler(
 
@@ -48,20 +67,22 @@ def main():
 
         states={
 
+            #regular expression for all languages should be here.
             MENU : [
-                RegexHandler('^(💰 Wallet)$', w.show_wallet, pass_user_data=True),
-                RegexHandler('^(📊 Exchange)$', t.show_trade),
-                RegexHandler('^(🔩 Settings)$', i.show_settings, pass_user_data=True),
-                RegexHandler('^(ℹ About us)$', i.about_us)
+                RegexHandler('^(💰 Кошелек)$', w.show_wallet, pass_user_data=True),
+                RegexHandler('^(📊 Купить/продать BTC)$', t.show_trade),
+                RegexHandler('^(🔩 Настройки)$', i.show_settings, pass_user_data=True),
+                RegexHandler('^(ℹ О сервисе)$', i.about_us)
             ],
 
-            ADDRESS_INPUT : [
-                RegexHandler('Cancel', cancel),
-                MessageHandler(Filters.text, bitcoin.withdraw)
+            WITHDRAW : [
+                RegexHandler('Отмена', cancel, pass_user_data=True),
+                MessageHandler(Filters.text, transfer.withdraw, pass_user_data=True)
             ]
         },
 
-        fallbacks=[CallbackQueryHandler(router.query_route)]
+        fallbacks=[CallbackQueryHandler(router.query_route, pass_user_data=True)],
+        allow_reentry=True
     )
 
 
