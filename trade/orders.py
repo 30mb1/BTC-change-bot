@@ -3,7 +3,7 @@ from telegram import (ReplyKeyboardMarkup, ReplyKeyboardRemove, ParseMode, Inlin
 import texts
 from database import users
 
-def show_advertisements(bot, update, user_data):
+def show_orders(bot, update, user_data):
     user_id = update.callback_query.from_user.id
     message = texts.advs_msg_.format(99999)
 
@@ -28,7 +28,7 @@ def show_advertisements(bot, update, user_data):
         parse_mode=ParseMode.MARKDOWN
     )
 
-def create_advertisement(bot, update, user_data):
+def create_order(bot, update, user_data):
     keyboard = [[texts.adv_create_2_], [texts.adv_create_3_], [texts.cancel_]]
     bot.send_message(chat_id=update.callback_query.from_user.id, text=texts.adv_create_1_, reply_markup=ReplyKeyboardMarkup(keyboard))
 

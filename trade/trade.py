@@ -1,14 +1,14 @@
 from telegram import (ReplyKeyboardMarkup, ReplyKeyboardRemove, ParseMode, InlineKeyboardButton,
                     InlineKeyboardMarkup, ParseMode)
 import texts
-from trade import listing
-from trade import advertisements
+from trade import exchange
+from trade import orders
 
 MENU, WITHDRAW = range(2)
 
 
 def show_trade(bot, update):
-    message = texts.trade_msg_.format(9999999) + 'RUB'
+    message = texts.trade_msg_.format(240000) + 'RUB'
 
     keyboard = [
         [InlineKeyboardButton("Buy 📈", callback_data='trade buy'),
@@ -32,16 +32,20 @@ def query_route(bot, update, user_data):
 
     user_data.setdefault(query.message.message_id, { 'page' : 0 })
 
-
     if data == 'buy' or data == 'sell':
         user_data[query.message.message_id]['trade'] = data
-        listing.show_pay_systems(bot, update, user_data)
+        exchange.show_pay_systems(bot, update, user_data)
     elif data == 'next_systems' or data == 'back_systems':
-        listing.show_pay_systems(bot, update, user_data)
-    elif data == 'cancel':
+        exchange.show_pay_systems(bot, update, user_data)
+    elif data == 'system':
         user_data[query.message.message_id]['page'] = 0
-        show_trade(bot, update)
+        exchange.show_orders(bot, update, user_data)
+    elif data == 'next_orders' or data == 'back_systems':
+        exchange.show_orders(bot, update, user_data)
     elif data == 'advs':
-        advertisements.show_advertisements(bot, update, user_data)
+        advertisements.show_orders(bot, update, user_data)
     elif data == 'create':
-        advertisements.create_advertisement(bot, update, user_data)
+        orders.create_order(bot, update, user_data)
+    elif data == 'cancel':
+        user_data.clear()
+        show_trade(bot, update)

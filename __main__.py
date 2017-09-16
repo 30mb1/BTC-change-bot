@@ -17,9 +17,8 @@ from database import users
 from ast import literal_eval
 
 
-logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO)
+logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.DEBUG)
 logger = logging.getLogger('Main')
-logger.setLevel(logging.INFO)
 
 MENU, WITHDRAW = range(2)
 
@@ -42,7 +41,6 @@ def start(bot, update, user_data):
 
     #print (literal_eval(update.message.from_user.to_json()))
     users.register_user(literal_eval(update.message.from_user.to_json()))
-
 
     update.message.reply_text(message, reply_markup=ReplyKeyboardMarkup(menu_keyboard))
 

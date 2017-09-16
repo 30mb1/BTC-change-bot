@@ -28,6 +28,8 @@ def check_balance(bot, update, user_data):
     #check for valid input
     try:
         sum_to_withdraw = float(update.message.text)
+        if sum_to_withdraw <= 0:
+            raise Exception
     except:
         update.message.reply_text(texts.incorrect_input_)
         return False
