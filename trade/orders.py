@@ -1,26 +1,43 @@
 from telegram import (ReplyKeyboardMarkup, ReplyKeyboardRemove, ParseMode, InlineKeyboardButton,
                     InlineKeyboardMarkup, ParseMode)
 import texts
-from database import users
+from database import users, pay_systems
+from decimal import *
 
-def show_orders(bot, update, user_data):
-    user_id = update.callback_query.from_user.id
-    message = texts.advs_msg_.format(99999)
+def show_order(bot, update, user_data):
+    msg_id = update.callback_query.message.message_id
+    data = update.callback_query.data.split()
 
-    keyboard = []
+    order_id = data[2]
 
-    for deal in users.get_advs_by_user(user_id):
-        trade = texts.buy_ if deal['trade'] == 'but' else texts.sell_
-        visible  = '' if deal['visible'] == True else '[OFF]'
-        name = deal['name']
-        rate = str(deal['rate'])
-        button_sign = ' '.join(trade, visible, name, rate)
-        keyboard.append([InlineKeyboardButton(button_sign, callback_data='trade ' + deal['id'])])
+    order = pay_systems.get_order_by_id(order_id)
 
-    keyboard.append(
-        [InlineKeyboardButton(texts.add_, callback_data='trade create'),
-        InlineKeyboardButton(texts.back_, callback_data='trade cancel')]
-    )
+    user = users.get_user_by_usid(order['user_id'])
+
+    pay_system = pay_systems.get_system_by_id(order['pay_system_id'])
+
+    crypto_cur = pay_systems.get_currency_by_id(user['base_currency_id'])
+
+    fiat_cur = pay_systems.get_currency_by_id(user['base_fiat_currency_id'])
+
+    if user_data[msg_id]['trade'] == 'buy':
+        message = texts.buy_order_
+    else:
+        message = texts.sell_order_
+
+    message = message.format(
+            pay_system['name'],
+            user['username'],
+            crypto_cur['alias'],
+            order['rate'].quantize(Decimal('.01')),
+            fiat_cur['alias'],
+            order['min'].quantize(Decimal('.01')),
+            fiat_cur['alias'],
+            order['max'].quantize(Decimal('.01')),
+            fiat_cur['alias']
+        )
+
+    keyboard = [[InlineKeyboardButton(texts.cancel_, callback_data='trade system {}'.format(order['pay_system_id'])), InlineKeyboardButton(texts.start_deal_, callback_data='trade start_deal {}'.format(order_id))]]
 
     update.callback_query.message.edit_text(
         message,
@@ -28,8 +45,49 @@ def show_orders(bot, update, user_data):
         parse_mode=ParseMode.MARKDOWN
     )
 
-def create_order(bot, update, user_data):
-    keyboard = [[texts.adv_create_2_], [texts.adv_create_3_], [texts.cancel_]]
-    bot.send_message(chat_id=update.callback_query.from_user.id, text=texts.adv_create_1_, reply_markup=ReplyKeyboardMarkup(keyboard))
 
-    return
+def show_user_orders(bot, update, user_data):
+    tg_id = update.callback_query.from_user.id
+    msg_id = update.callback_query.message.message_id
+    data = update.callback_query.data.split()
+
+    message = texts.advs_msg_.format(240000)
+
+    buy_orders = users.get_user_buy_orders(tg_id)
+    sell_orders =  users.get_user_sell_orders(tg_id)
+
+
+    #manually add add_new_order button, buy_orders button and sell_orders button.
+    keyboard = [
+                [InlineKeyboardButton(texts.add_, callback_data='trade create_order')],
+                [InlineKeyboardButton(texts.buy_.format(len(buy_orders)), callback_data='trade my_orders buy'),
+                InlineKeyboardButton(texts.sell_.format(len(sell_orders)), callback_data='trade my_orders sell')]
+            ]
+
+    orders = buy_orders if data[2] == 'buy' else sell_orders
+
+    #if data[2] == 'buy':
+    #    orders = buy_orders
+    #else:
+    #    orders = sell_orders
+
+    for item in orders:
+        visible = '' if item['visible'] else '[OFF]'
+        pay_system = pay_systems.get_system_by_id(item['pay_system_id'])['name']
+        button_sign = '{} {}, {}, {}, {}'.format(
+                                            visible,
+                                            pay_system,
+                                            item['alias'],
+                                            item['rate'].quantize(Decimal('.01')),
+                                            item['symbol']
+                                        )
+
+        keyboard.append([InlineKeyboardButton(button_sign, callback_data='trade setup_order {}'.format(item['id']))])
+
+    keyboard.append([InlineKeyboardButton(texts.cancel_, callback_data='trade cancel')])
+
+    update.callback_query.message.edit_text(
+        message,
+        reply_markup=InlineKeyboardMarkup(keyboard),
+        parse_mode=ParseMode.MARKDOWN
+    )

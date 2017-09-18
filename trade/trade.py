@@ -13,7 +13,7 @@ def show_trade(bot, update):
     keyboard = [
         [InlineKeyboardButton("Buy 📈", callback_data='trade buy'),
         InlineKeyboardButton("Sell 📉", callback_data='trade sell'),
-        InlineKeyboardButton(texts.my_advs_, callback_data='trade advs')]
+        InlineKeyboardButton(texts.my_advs_, callback_data='trade my_orders buy')]
     ]
 
     if update.callback_query:
@@ -39,13 +39,13 @@ def query_route(bot, update, user_data):
         exchange.show_pay_systems(bot, update, user_data)
     elif data == 'system':
         user_data[query.message.message_id]['page'] = 0
-        exchange.show_orders(bot, update, user_data)
-    elif data == 'next_orders' or data == 'back_systems':
-        exchange.show_orders(bot, update, user_data)
-    elif data == 'advs':
-        advertisements.show_orders(bot, update, user_data)
-    elif data == 'create':
-        orders.create_order(bot, update, user_data)
+        exchange.show_system_orders(bot, update, user_data)
+    elif data == 'next_orders' or data == 'back_orders':
+        exchange.show_system_orders(bot, update, user_data)
+    elif data == 'show_order':
+        orders.show_order(bot, update, user_data)
+    elif data == 'my_orders':
+        orders.show_user_orders(bot, update, user_data)
     elif data == 'cancel':
-        user_data.clear()
+        user_data.pop(query.message.message_id, None)
         show_trade(bot, update)
