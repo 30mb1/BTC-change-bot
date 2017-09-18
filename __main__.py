@@ -17,7 +17,7 @@ from database import users
 from ast import literal_eval
 
 
-logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.DEBUG)
+logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO)
 logger = logging.getLogger('Main')
 
 MENU, WITHDRAW = range(2)
