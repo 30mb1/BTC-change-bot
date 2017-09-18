@@ -1,7 +1,7 @@
 from telegram import (ReplyKeyboardMarkup, ReplyKeyboardRemove, ParseMode, InlineKeyboardButton,
                     InlineKeyboardMarkup, ParseMode)
 from telegram.ext import Updater, ConversationHandler, RegexHandler, CommandHandler, MessageHandler, Filters
-from bitcoin import bitcoin
+from bitcoin import transfer
 import texts
 from database import users
 
@@ -45,6 +45,6 @@ def query_route(bot, update, user_data):
         )
         bot.send_message(
             chat_id=query.message.chat_id,
-            text="*{}*".format(bitcoin.get_address(query.message.from_user.id)),
+            text="*{}*".format(transfer.get_address(query.message.from_user.id)),
             parse_mode=ParseMode.MARKDOWN
         )
