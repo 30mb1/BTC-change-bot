@@ -21,16 +21,7 @@ def show_pay_systems(bot, update, user_data):
     systems = pay_systems.get_pay_systems_list(update.callback_query.from_user.id)
 
     #store only systems where advs are
-    #if user_data[msg_id]['trade'] == 'buy':
-    #    systems = [item for item in systems if item['sell_count'] != 0]
-    #else:
-    #    systems = [item for item in systems if item['buy_count'] != 0]
-
-    #if there are no advs at all, show appropriate mesage
-    #if len(systems) == 0:
-    #    bot.send_message(text=texts.no_advs_.format('RUB'), chat_id=update.callback_query.from_user.id)
-    #    return
-
+    
     #checking which button was pressed bu the user
     if data == 'next_systems':
 
@@ -59,11 +50,6 @@ def show_pay_systems(bot, update, user_data):
         to_ = from_ + PAGE_SIZE
 
     #choosing appropriate message
-    #if user_data[msg_id]['trade'] == 'buy':
-    #    message = texts.buy_text_.format(12345)
-    #else:
-    #    message = texts.sell_text_.format(12345)
-
     message = texts.buy_text_ if user_data[msg_id]['trade'] == 'buy' else texts.sell_text_
     message = message.format(240000)
 
@@ -131,12 +117,6 @@ def show_system_orders(bot, update, user_data):
         to_ = from_ + PAGE_SIZE
 
     system_name = pay_systems.get_system_by_id(pay_system_id)['name']
-
-    #if user_data[msg_id]['trade'] == 'buy':
-    #    message = texts.buy_list_.format(len(orders), system_name)
-    #else:
-    #    message = texts.sell_list_.format(len(orders), system_name)
-
 
     message = texts.buy_list_ if user_data[msg_id]['trade'] == 'buy' else texts.sell_list_
     message = message.format(len(orders), system_name)

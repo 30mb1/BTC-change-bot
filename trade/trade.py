@@ -1,8 +1,8 @@
 from telegram import (ReplyKeyboardMarkup, ReplyKeyboardRemove, ParseMode, InlineKeyboardButton,
                     InlineKeyboardMarkup, ParseMode)
 import texts
-from trade import exchange
-from trade import orders
+from trade import exchange, orders
+from admin import admin
 
 MENU, WITHDRAW = range(2)
 
@@ -13,7 +13,7 @@ def show_trade(bot, update):
     keyboard = [
         [InlineKeyboardButton("Buy 📈", callback_data='trade buy'),
         InlineKeyboardButton("Sell 📉", callback_data='trade sell'),
-        InlineKeyboardButton(texts.my_advs_, callback_data='trade my_orders buy')]
+        InlineKeyboardButton(texts.my_advs_, callback_data='admin my_orders buy')]
     ]
 
     if update.callback_query:
@@ -44,8 +44,6 @@ def query_route(bot, update, user_data):
         exchange.show_system_orders(bot, update, user_data)
     elif data == 'show_order':
         orders.show_order(bot, update, user_data)
-    elif data == 'my_orders':
-        orders.show_user_orders(bot, update, user_data)
     elif data == 'cancel':
         user_data.pop(query.message.message_id, None)
         show_trade(bot, update)

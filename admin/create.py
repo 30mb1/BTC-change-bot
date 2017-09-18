@@ -3,3 +3,7 @@ from telegram import (ReplyKeyboardMarkup, ReplyKeyboardRemove, ParseMode, Inlin
 import texts
 from database import users, pay_systems
 from decimal import *
+
+
+def create_order(bot, update, user_data):
+    pass
