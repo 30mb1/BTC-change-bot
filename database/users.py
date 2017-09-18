@@ -40,6 +40,16 @@ def get_user_by_tgid(cursor, tg_id):
     return {'id' : out[0], 'phone' : out[2], 'username' : out[3], 'first_name' : out[4], 'last_name' : out[5], 'lang' : out[6], 'base_fiat_currency_id' : out[8], 'base_currency_id' : out[9]}
 
 @connect
+def get_user_by_usid(cursor, user_id):
+    query = "SELECT * FROM user WHERE id = {}".format(user_id)
+
+    cursor.execute(query)
+
+    out = cursor.fetchone()
+
+    return {'id' : out[0], 'phone' : out[2], 'username' : out[3], 'first_name' : out[4], 'last_name' : out[5], 'lang' : out[6], 'base_fiat_currency_id' : out[8], 'base_currency_id' : out[9]}
+
+@connect
 def get_user_balance(cursor, tg_id):
 
     user = get_user_by_tgid(tg_id)
@@ -51,3 +61,37 @@ def get_user_balance(cursor, tg_id):
     output = cursor.fetchone()
 
     return output[0]
+
+@connect
+def get_user_buy_orders(cursor, tg_id):
+    user = get_user_by_tgid(tg_id)
+
+    #select only rows when we buy crypt currencies
+    query = ("SELECT t1.visible, t1.pay_system_id, t1.rate, t2.alias, t3.symbol, t1.id\n"
+            "FROM `order` t1\n"
+            "CROSS JOIN `currency` t2 ON t1.ref_currency_id = t2.id AND t2.type = 'crypto'\n" "CROSS JOIN `currency` t3 ON t3.id = t1.base_currency_id\n"
+            "WHERE t1.user_id = {}".format(user['id']))
+
+    cursor.execute(query)
+
+    orders_list = cursor.fetchall()
+
+    return [{ 'visible' : order[0], 'pay_system_id' : order[1], 'rate' : order[2], 'alias' : order[3], 'symbol' : order[4], 'id' : order[5] } for order in orders_list]
+
+@connect
+def get_user_sell_orders(cursor, tg_id):
+    user = get_user_by_tgid(tg_id)
+
+    user = get_user_by_tgid(tg_id)
+
+    #select only rows when we buy crypt currencies
+    query = ("SELECT t1.visible, t1.pay_system_id, t1.rate, t3.alias, t2.symbol, t1.id\n"
+            "FROM `order` t1\n"
+            "CROSS JOIN `currency` t2 ON t1.ref_currency_id = t2.id AND t2.type = 'fiat'\n" "CROSS JOIN `currency` t3 ON t3.id = t1.base_currency_id\n"
+            "WHERE t1.user_id = {}".format(user['id']))
+
+    cursor.execute(query)
+
+    orders_list = cursor.fetchall()
+
+    return [{ 'visible' : order[0], 'pay_system_id' : order[1], 'rate' : order[2], 'alias' : order[3], 'symbol' : order[4], 'id' : order[5] } for order in orders_list]
