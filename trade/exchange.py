@@ -14,46 +14,29 @@ def show_pay_systems(bot, update, user_data):
     msg_id = update.callback_query.message.message_id
     data = update.callback_query.data.split()[1]
     page = user_data[msg_id]['page']
-    from_ = page
-    to_ = page + PAGE_SIZE
 
     #we know base_fiat_currency for every user. Getting list of available methods for selected currency
     systems = pay_systems.get_pay_systems_list(update.callback_query.from_user.id)
 
+    paginated_systems = [systems[i:i + PAGE_SIZE] for i in range(0, len(systems), PAGE_SIZE)]
     #store only systems where advs are
-    
+
     #checking which button was pressed bu the user
     if data == 'next_systems':
 
         #increase page counter for this message
         page = user_data[msg_id]['page'] = user_data[msg_id]['page'] + 1
-
-        #show only PAGE_SIZE pay systems on one page
-        #check if we have not full pages
-        if len(systems) % PAGE_SIZE != 0:
-            page = page % int(len(systems) / PAGE_SIZE + 1)
-        else:
-            page = page % int(len(systems) / PAGE_SIZE)
-
-        from_ = page * PAGE_SIZE
-        to_ = from_ + PAGE_SIZE
+        page = page % len(paginated_systems)
 
     elif data == 'back_systems':
         page = user_data[msg_id]['page'] = user_data[msg_id]['page'] - 1
-
-        if len(systems) % PAGE_SIZE != 0:
-            page = page % int(len(systems) / PAGE_SIZE + 1)
-        else:
-            page = page % int(len(systems) / PAGE_SIZE)
-
-        from_ = page * PAGE_SIZE
-        to_ = from_ + PAGE_SIZE
+        page = page % len(paginated_systems)
 
     #choosing appropriate message
     message = texts.buy_text_ if user_data[msg_id]['trade'] == 'buy' else texts.sell_text_
     message = message.format(240000)
 
-    keyboard = [[InlineKeyboardButton(item['name'], callback_data='trade system {}'.format(item['id']))] for item in systems[from_:to_]]
+    keyboard = [[InlineKeyboardButton(item['name'], callback_data='trade system {}'.format(item['id']))] for item in paginated_systems[page]]
 
     #manually adding next/cancel/back row of buttons
     keyboard.append(
@@ -84,37 +67,21 @@ def show_system_orders(bot, update, user_data):
 
     orders = pay_systems.get_orders_for_system(update.callback_query.from_user.id, buy, pay_system_id)
 
-    page = user_data[msg_id]['page']
-    from_ = page
-    to_ = page + PAGE_SIZE
+    paginated_orders = [orders[i:i + PAGE_SIZE] for i in range(0, len(orders), PAGE_SIZE)]
 
+    page = user_data[msg_id]['page']
 
     #checking which button was pressed bu the user
     if trend == 'next_orders':
 
         #increase page counter for this message
         page = user_data[msg_id]['page'] = user_data[msg_id]['page'] + 1
+        page = page % len(paginated_orders)
 
-        #show only PAGE_SIZE pay systems on one page
-        #check if we have not full pages
-        if len(orders) % PAGE_SIZE != 0:
-            page = page % int(len(orders) / PAGE_SIZE + 1)
-        else:
-            page = page % int(len(orders) / PAGE_SIZE)
-
-        from_ = page * PAGE_SIZE
-        to_ = from_ + PAGE_SIZE
 
     elif trend == 'back_orders':
         page = user_data[msg_id]['page'] = user_data[msg_id]['page'] - 1
-
-        if len(orders) % PAGE_SIZE != 0:
-            page = page % int(len(orders) / PAGE_SIZE + 1)
-        else:
-            page = page % int(len(orders) / PAGE_SIZE)
-
-        from_ = page * PAGE_SIZE
-        to_ = from_ + PAGE_SIZE
+        page = page % len(paginated_orders)
 
     system_name = pay_systems.get_system_by_id(pay_system_id)['name']
 
@@ -128,7 +95,7 @@ def show_system_orders(bot, update, user_data):
 
     keyboard = []
 
-    for i in orders[from_:to_]:
+    for i in paginated_orders[page]:
         user = users.get_user_by_usid(i['user_id'])
 
         button_sign = "{} {} ({} - {} {}) {}".format(
