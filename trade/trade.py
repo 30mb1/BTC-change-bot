@@ -3,13 +3,11 @@ from telegram import (ReplyKeyboardMarkup, ReplyKeyboardRemove, ParseMode, Inlin
 import texts
 from trade import exchange, orders
 from admin import admin
+from database import pay_systems, users
 
 MENU, WITHDRAW = range(2)
 
-
 def show_trade(bot, update):
-    message = texts.trade_msg_.format(240000) + 'RUB'
-
     keyboard = [
         [InlineKeyboardButton("Buy 📈", callback_data='trade buy'),
         InlineKeyboardButton("Sell 📉", callback_data='trade sell'),
@@ -17,12 +15,24 @@ def show_trade(bot, update):
     ]
 
     if update.callback_query:
+
+        currency_id = users.get_user_by_tgid(update.callback_query.from_user.id)['base_currency_id']
+        currency = pay_systems.get_currency_by_id(currency_id)
+
+        message = texts.trade_msg_.format(currency['name'], currency['name'], 240000) + 'RUB'
+
         update.callback_query.message.edit_text(
             message,
             reply_markup=InlineKeyboardMarkup(keyboard),
             parse_mode=ParseMode.MARKDOWN
         )
         return
+
+    currency_id = users.get_user_by_tgid(update.message.from_user.id)['base_currency_id']
+    currency = pay_systems.get_currency_by_id(currency_id)
+
+    message = texts.trade_msg_.format(currency['name'], currency['name'], 240000) + 'RUB'
+
     update.message.reply_text(message,  reply_markup=InlineKeyboardMarkup(keyboard),
         parse_mode=ParseMode.MARKDOWN)
 

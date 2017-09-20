@@ -4,6 +4,7 @@ from telegram.ext import Updater, ConversationHandler, RegexHandler, CommandHand
 from wallet import wallet as w
 from trade import trade as t
 from admin import admin as a
+from instruments import instruments as i
 
 
 def query_route(bot, update, user_data):
@@ -18,3 +19,6 @@ def query_route(bot, update, user_data):
 
     if 'admin' in data:
         return a.query_route(bot, update, user_data)
+
+    if 'settings' in data:
+        return i.query_route(bot, update, user_data)

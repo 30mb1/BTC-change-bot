@@ -2,7 +2,8 @@ from telegram import (ReplyKeyboardMarkup, ReplyKeyboardRemove, ParseMode, Inlin
                     InlineKeyboardMarkup, ParseMode)
 import texts
 from database import users, pay_systems
-from admin import create, settings
+from admin import create, setup
+from instruments import settings
 from trade import trade
 from decimal import *
 
@@ -13,12 +14,12 @@ def show_admin(bot, update, user_data):
 
     message = texts.advs_msg_.format(240000)
 
-    buy_orders = users.get_user_buy_orders(tg_id)
-    sell_orders =  users.get_user_sell_orders(tg_id)
+    buy_orders = users.get_user_orders(tg_id, 'crypto')
+    sell_orders = users.get_user_orders(tg_id, 'fiat')
 
     #manually add add_new_order button, buy_orders button and sell_orders button.
-    keyboard = [[InlineKeyboardButton(texts.choose_fiat_, callback_data='admin choose_fiat'),
-                InlineKeyboardButton(texts.choose_crypto_, callback_data='admin choose_crypto')],
+    keyboard = [[InlineKeyboardButton(texts.choose_fiat_, callback_data='settings choose_fiat from_admin'),
+                InlineKeyboardButton(texts.choose_crypto_, callback_data='settings choose_crypto from_admin')],
                 [InlineKeyboardButton(texts.buy_.format(len(buy_orders)), callback_data='admin my_orders buy'),
                 InlineKeyboardButton(texts.sell_.format(len(sell_orders)), callback_data='admin my_orders sell')]
             ]
@@ -28,12 +29,13 @@ def show_admin(bot, update, user_data):
     for item in orders:
         visible = '' if item['visible'] else '[OFF]'
         pay_system = pay_systems.get_system_by_id(item['pay_system_id'])['name']
-        button_sign = '{} {}, {}, {}, {}'.format(
+        symbol = item['symbol1'] if item['symbol2'] == None else item['symbol2']
+        button_sign = '{} {}, {}-{}, {} {}'.format(
                                             visible,
                                             pay_system,
-                                            item['alias'],
+                                            item['alias1'], item['alias2'],
                                             item['rate'].quantize(Decimal('.01')),
-                                            item['symbol']
+                                            symbol
                                         )
 
         keyboard.append([InlineKeyboardButton(button_sign, callback_data='admin setup_order {}'.format(item['id']))])
@@ -58,9 +60,5 @@ def query_route(bot, update, user_data):
         trade.show_trade(bot, update)
     elif data == 'create_order':
         create.create_order(bot, update, user_data)
-    elif data == 'choose_fiat':
-        settings.set_fiat(bot, update, user_data)
-    elif data == 'choose_crypto':
-        settings.set_crypto(bot, update, user_data)
     elif data == 'setup_order':
-        settings.setup__order(bot, update, user_data)
+        setup.setup_order(bot, update, user_data)

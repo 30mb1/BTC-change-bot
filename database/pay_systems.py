@@ -64,3 +64,13 @@ def get_order_by_id(cursor, order_id):
     res = cursor.fetchone()
 
     return { 'id' : res[0], 'user_id' : res[1], 'base_currency_id' : res[2], 'ref_currency_id' : res[3], 'rate' : res[4], 'min' : res[5], 'max' : res[6], 'message' : res[7], 'pay_system_id' : res[8], 'visible' : res[9] }
+
+@connect
+def get_currencies_of_type(cursor, type_):
+    query = "SELECT * FROM currency WHERE type ='{}'".format(type_)
+
+    cursor.execute(query)
+
+    currency_list = cursor.fetchall()
+
+    return [{ 'id' : cur[0], 'alias' : cur[4] } for cur in currency_list]

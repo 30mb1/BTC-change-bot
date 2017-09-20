@@ -22,7 +22,7 @@ logger = logging.getLogger('Main')
 
 MENU, WITHDRAW = range(2)
 
-menu_keyboard = [['💰 Кошелек', '📊 Купить/продать BTC'], ['ℹ О сервисе', '🔩 Настройки']]
+menu_keyboard = [['💰 Кошелек', '📊 Купить/продать'], ['ℹ О сервисе', '🔩 Настройки']]
 
 
 def error_callback(bot, update, error):
@@ -68,8 +68,8 @@ def main():
             #regular expression for all languages should be here.
             MENU : [
                 RegexHandler('^(💰 Кошелек)$', w.show_wallet, pass_user_data=True),
-                RegexHandler('^(📊 Купить/продать BTC)$', t.show_trade),
-                RegexHandler('^(🔩 Настройки)$', i.show_settings, pass_user_data=True),
+                RegexHandler('^(📊 Купить/продать)$', t.show_trade),
+                RegexHandler('^(🔩 Настройки)$', i.show_instruments, pass_user_data=True),
                 RegexHandler('^(ℹ О сервисе)$', i.about_us)
             ],
 

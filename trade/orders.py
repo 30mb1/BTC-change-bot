@@ -20,14 +20,19 @@ def show_order(bot, update, user_data):
 
     fiat_cur = pay_systems.get_currency_by_id(user['base_fiat_currency_id'])
 
+    user_currency_id = users.get_user_by_tgid(update.callback_query.from_user.id)['base_currency_id']
+    user_currency = pay_systems.get_currency_by_id(user_currency_id)
+
     if user_data[msg_id]['trade'] == 'buy':
         message = texts.buy_order_
     else:
         message = texts.sell_order_
 
     message = message.format(
+            user_currency['name'],
             pay_system['name'],
             user['username'],
+            order['message'],
             crypto_cur['alias'],
             order['rate'].quantize(Decimal('.01')),
             fiat_cur['alias'],

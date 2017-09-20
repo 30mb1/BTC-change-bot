@@ -15,6 +15,10 @@ def show_pay_systems(bot, update, user_data):
     data = update.callback_query.data.split()[1]
     page = user_data[msg_id]['page']
 
+    #cryptocurrency selected ny user
+    user_currency_id = users.get_user_by_tgid(update.callback_query.from_user.id)['base_currency_id']
+    user_currency = pay_systems.get_currency_by_id(user_currency_id)
+
     #we know base_fiat_currency for every user. Getting list of available methods for selected currency
     systems = pay_systems.get_pay_systems_list(update.callback_query.from_user.id)
 
@@ -34,9 +38,10 @@ def show_pay_systems(bot, update, user_data):
 
     #choosing appropriate message
     message = texts.buy_text_ if user_data[msg_id]['trade'] == 'buy' else texts.sell_text_
-    message = message.format(240000)
+    message = message.format(user_currency['name'], 240000)
 
-    keyboard = [[InlineKeyboardButton(item['name'], callback_data='trade system {}'.format(item['id']))] for item in paginated_systems[page]]
+    if len(paginated_systems):
+        keyboard = [[InlineKeyboardButton(item['name'], callback_data='trade system {}'.format(item['id']))] for item in paginated_systems[page]]
 
     #manually adding next/cancel/back row of buttons
     keyboard.append(
@@ -60,10 +65,11 @@ def show_system_orders(bot, update, user_data):
     trend = data[1]
     pay_system_id = data[2]
 
-    if user_data[msg_id]['trade'] == 'buy':
-        buy = 1
-    else:
-        buy = 0
+
+    buy = 0 if user_data[msg_id]['trade'] == 'buy' else 1
+
+    user_currency_id = users.get_user_by_tgid(update.callback_query.from_user.id)['base_currency_id']
+    user_currency = pay_systems.get_currency_by_id(user_currency_id)
 
     orders = pay_systems.get_orders_for_system(update.callback_query.from_user.id, buy, pay_system_id)
 
@@ -86,7 +92,7 @@ def show_system_orders(bot, update, user_data):
     system_name = pay_systems.get_system_by_id(pay_system_id)['name']
 
     message = texts.buy_list_ if user_data[msg_id]['trade'] == 'buy' else texts.sell_list_
-    message = message.format(len(orders), system_name)
+    message = message.format(user_currency['name'], len(orders), system_name)
 
     #get symbol of fiat currency for selected pay_system
     currency_id = pay_systems.get_system_by_id(pay_system_id)['currency_id']
@@ -95,19 +101,20 @@ def show_system_orders(bot, update, user_data):
 
     keyboard = []
 
-    for i in paginated_orders[page]:
-        user = users.get_user_by_usid(i['user_id'])
+    if len(paginated_orders):
+        for i in paginated_orders[page]:
+            user = users.get_user_by_usid(i['user_id'])
 
-        button_sign = "{} {} ({} - {} {}) {}".format(
-                                                i['rate'].quantize(Decimal('.01')),
-                                                symbol,
-                                                i['min'].quantize(Decimal('.01')),
-                                                i['max'].quantize(Decimal('.01')),
-                                                symbol,
-                                                user['username']
-                                            )
+            button_sign = "{} {} ({} - {} {}) {}".format(
+                                                    i['rate'].quantize(Decimal('.01')),
+                                                    symbol,
+                                                    i['min'].quantize(Decimal('.01')),
+                                                    i['max'].quantize(Decimal('.01')),
+                                                    symbol,
+                                                    user['username']
+                                                )
 
-        keyboard.append([InlineKeyboardButton(button_sign, callback_data='trade show_order {}'.format(i['id']))])
+            keyboard.append([InlineKeyboardButton(button_sign, callback_data='trade show_order {}'.format(i['id']))])
 
     #manually adding next/cancel/back row of buttons
     keyboard.append(

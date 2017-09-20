@@ -63,35 +63,27 @@ def get_user_balance(cursor, tg_id):
     return output[0]
 
 @connect
-def get_user_buy_orders(cursor, tg_id):
+def get_user_orders(cursor, tg_id, type_):
     user = get_user_by_tgid(tg_id)
 
     #select only rows when we buy crypt currencies
-    query = ("SELECT t1.visible, t1.pay_system_id, t1.rate, t2.alias, t3.symbol, t1.id\n"
+    query = ("SELECT t1.visible, t1.pay_system_id, t1.rate, t2.alias, t3.symbol, t1.id, t2.symbol, t3.alias\n"
             "FROM `order` t1\n"
-            "CROSS JOIN `currency` t2 ON t1.ref_currency_id = t2.id AND t2.type = 'crypto'\n" "CROSS JOIN `currency` t3 ON t3.id = t1.base_currency_id\n"
-            "WHERE t1.user_id = {}".format(user['id']))
+            "CROSS JOIN `currency` t2 ON t1.ref_currency_id = t2.id AND t2.type = '{}'\n"
+            "CROSS JOIN `currency` t3 ON t3.id = t1.base_currency_id\n"
+            "WHERE t1.user_id = {}".format(type_, user['id']))
 
     cursor.execute(query)
 
     orders_list = cursor.fetchall()
 
-    return [{ 'visible' : order[0], 'pay_system_id' : order[1], 'rate' : order[2], 'alias' : order[3], 'symbol' : order[4], 'id' : order[5] } for order in orders_list]
+    return [{ 'visible' : order[0], 'pay_system_id' : order[1], 'rate' : order[2], 'alias1' : order[3], 'symbol1' : order[4], 'symbol2' : order[6], 'id' : order[5], 'alias2' : order[7] } for order in orders_list]
 
 @connect
-def get_user_sell_orders(cursor, tg_id):
-    user = get_user_by_tgid(tg_id)
-
-    user = get_user_by_tgid(tg_id)
-
-    #select only rows when we buy crypt currencies
-    query = ("SELECT t1.visible, t1.pay_system_id, t1.rate, t3.alias, t2.symbol, t1.id\n"
-            "FROM `order` t1\n"
-            "CROSS JOIN `currency` t2 ON t1.ref_currency_id = t2.id AND t2.type = 'fiat'\n" "CROSS JOIN `currency` t3 ON t3.id = t1.base_currency_id\n"
-            "WHERE t1.user_id = {}".format(user['id']))
+def set_currency(cursor, tg_id, currency_id, type_):
+    if type_ == 'fiat':
+        query = "UPDATE user SET base_fiat_currency_id = {} WHERE tg_id = {}".format(currency_id, tg_id)
+    else:
+        query = "UPDATE user SET base_currency_id = {} WHERE tg_id = {}".format(currency_id, tg_id)
 
     cursor.execute(query)
-
-    orders_list = cursor.fetchall()
-
-    return [{ 'visible' : order[0], 'pay_system_id' : order[1], 'rate' : order[2], 'alias' : order[3], 'symbol' : order[4], 'id' : order[5] } for order in orders_list]
