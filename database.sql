@@ -26,14 +26,14 @@ CREATE TABLE `account` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `user_id` int(11) NOT NULL,
   `currency_id` int(11) NOT NULL,
-  `balance` decimal(11,6) NOT NULL,
+  `balance` decimal(18,6) NOT NULL,
   `post_stamp` datetime NOT NULL,
   PRIMARY KEY (`id`),
   KEY `user_id` (`user_id`),
   KEY `currency_id` (`currency_id`),
   CONSTRAINT `account_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT `account_ibfk_2` FOREIGN KEY (`currency_id`) REFERENCES `currency` (`id`) ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -48,14 +48,14 @@ CREATE TABLE `balance_transaction` (
   `from_user_id` int(11) NOT NULL,
   `from_currency_id` int(11) NOT NULL,
   `from_hash` varchar(255) NOT NULL,
-  `from_amount` decimal(11,6) NOT NULL,
+  `from_amount` decimal(18,6) NOT NULL,
   `from_account_id` int(11) NOT NULL,
   `to_user_id` int(11) NOT NULL,
   `to_currency_id` int(11) NOT NULL,
   `to_hash` varchar(255) NOT NULL,
-  `to_amount` decimal(11,6) NOT NULL,
+  `to_amount` decimal(18,6) NOT NULL,
   `to_account_id` int(11) NOT NULL,
-  `rate` decimal(11,6) NOT NULL,
+  `rate` decimal(18,6) NOT NULL,
   `post_stamp` datetime NOT NULL,
   `tx_id` varchar(255) NOT NULL,
   `block_id` int(11) NOT NULL,
@@ -104,11 +104,12 @@ DROP TABLE IF EXISTS `currency`;
 CREATE TABLE `currency` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `type` varchar(20) NOT NULL,
+  `symbol` varchar(4) DEFAULT NULL,
   `name` varchar(30) NOT NULL,
   `alias` varchar(10) NOT NULL,
   `description` text,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -123,7 +124,7 @@ CREATE TABLE `currency_rate` (
   `currency_rate` varchar(45) NOT NULL,
   `base_currency_id` int(11) NOT NULL,
   `ref_currency_id` int(11) NOT NULL,
-  `rate` decimal(11,6) NOT NULL,
+  `rate` decimal(18,6) NOT NULL,
   `update_stamp` datetime NOT NULL,
   `expire_stamp` datetime NOT NULL,
   `expire` tinyint(4) NOT NULL,
@@ -133,6 +134,36 @@ CREATE TABLE `currency_rate` (
   CONSTRAINT `currency_rate_ibfk_1` FOREIGN KEY (`ref_currency_id`) REFERENCES `account` (`id`) ON UPDATE CASCADE,
   CONSTRAINT `currency_rate_ibfk_2` FOREIGN KEY (`base_currency_id`) REFERENCES `currency` (`id`) ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `order`
+--
+
+DROP TABLE IF EXISTS `order`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `order` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `user_id` int(11) NOT NULL,
+  `base_currency_id` int(11) NOT NULL,
+  `ref_currency_id` int(11) NOT NULL,
+  `rate` decimal(18,6) NOT NULL,
+  `min` decimal(18,6) NOT NULL,
+  `max` decimal(18,6) NOT NULL,
+  `message` text,
+  `pay_system_id` int(11) NOT NULL,
+  `visible` tinyint(4) NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `fk_rquest_1_idx` (`user_id`),
+  KEY `fk_rquest_2_idx` (`base_currency_id`),
+  KEY `fk_rquest_3_idx` (`ref_currency_id`),
+  KEY `fk_rquest_4_idx` (`pay_system_id`),
+  CONSTRAINT `fk_rquest_1` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`) ON UPDATE CASCADE,
+  CONSTRAINT `fk_rquest_2` FOREIGN KEY (`base_currency_id`) REFERENCES `currency` (`id`) ON UPDATE CASCADE,
+  CONSTRAINT `fk_rquest_3` FOREIGN KEY (`ref_currency_id`) REFERENCES `currency` (`id`) ON UPDATE CASCADE,
+  CONSTRAINT `fk_rquest_4` FOREIGN KEY (`pay_system_id`) REFERENCES `pay_system` (`id`) ON UPDATE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -150,36 +181,7 @@ CREATE TABLE `pay_system` (
   PRIMARY KEY (`id`),
   KEY `fk_pay_system_1_idx` (`currency_id`),
   CONSTRAINT `fk_pay_system_1` FOREIGN KEY (`currency_id`) REFERENCES `currency` (`id`) ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Table structure for table `request`
---
-
-DROP TABLE IF EXISTS `request`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `request` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `user_id` int(11) NOT NULL,
-  `base_currency_id` int(11) NOT NULL,
-  `ref_currency_id` int(11) NOT NULL,
-  `rate` decimal(11,6) NOT NULL,
-  `min` decimal(11,6) NOT NULL,
-  `max` decimal(11,6) NOT NULL,
-  `message` text,
-  `pay_system_id` int(11) NOT NULL,
-  PRIMARY KEY (`id`),
-  KEY `fk_rquest_1_idx` (`user_id`),
-  KEY `fk_rquest_2_idx` (`base_currency_id`),
-  KEY `fk_rquest_3_idx` (`ref_currency_id`),
-  KEY `fk_rquest_4_idx` (`pay_system_id`),
-  CONSTRAINT `fk_rquest_1` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`) ON UPDATE CASCADE,
-  CONSTRAINT `fk_rquest_2` FOREIGN KEY (`base_currency_id`) REFERENCES `currency` (`id`) ON UPDATE CASCADE,
-  CONSTRAINT `fk_rquest_3` FOREIGN KEY (`ref_currency_id`) REFERENCES `currency` (`id`) ON UPDATE CASCADE,
-  CONSTRAINT `fk_rquest_4` FOREIGN KEY (`pay_system_id`) REFERENCES `pay_system` (`id`) ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -198,9 +200,15 @@ CREATE TABLE `user` (
   `last_name` varchar(30) DEFAULT NULL,
   `lang` char(2) NOT NULL,
   `post_stamp` datetime NOT NULL,
+  `base_fiat_currency_id` int(11) NOT NULL,
+  `base_currency_id` int(11) NOT NULL,
   PRIMARY KEY (`id`),
-  UNIQUE KEY `tg_id_UNIQUE` (`tg_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+  UNIQUE KEY `tg_id_UNIQUE` (`tg_id`),
+  KEY `fk_user_1_idx` (`base_fiat_currency_id`),
+  KEY `fk_user_2_idx` (`base_currency_id`),
+  CONSTRAINT `fk_user_1` FOREIGN KEY (`base_fiat_currency_id`) REFERENCES `currency` (`id`) ON UPDATE CASCADE,
+  CONSTRAINT `fk_user_2` FOREIGN KEY (`base_currency_id`) REFERENCES `currency` (`id`) ON UPDATE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
@@ -212,4 +220,4 @@ CREATE TABLE `user` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2017-09-13 19:47:36
+-- Dump completed on 2017-10-03  0:08:23
