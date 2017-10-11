@@ -7,29 +7,25 @@ from instruments import settings
 from trade import trade
 from decimal import *
 
-def show_admin(bot, update, user_data):
-    tg_id = update.callback_query.from_user.id
-    msg_id = update.callback_query.message.message_id
-    data = update.callback_query.data.split()
+@info
+def show_admin(info, bot, update, user_data):
+    buy_orders = users.get_user_orders(info['tg_id'], 'crypto')
+    sell_orders = users.get_user_orders(info['tg_id'], 'fiat')
 
-    message = texts.advs_msg_.format(240000)
-
-    buy_orders = users.get_user_orders(tg_id, 'crypto')
-    sell_orders = users.get_user_orders(tg_id, 'fiat')
-
-    #manually add add_new_order button, buy_orders button and sell_orders button.
+    #manually add choose crypto/fiat currency buttons, buy_orders button and sell_orders button.
     keyboard = [[InlineKeyboardButton(texts.choose_fiat_, callback_data='settings choose_fiat from_admin'),
                 InlineKeyboardButton(texts.choose_crypto_, callback_data='settings choose_crypto from_admin')],
                 [InlineKeyboardButton(texts.buy_.format(len(buy_orders)), callback_data='admin my_orders buy'),
                 InlineKeyboardButton(texts.sell_.format(len(sell_orders)), callback_data='admin my_orders sell')]
             ]
 
-    orders = buy_orders if data[2] == 'buy' else sell_orders
+    orders = buy_orders if info['data'][2] == 'buy' else sell_orders
 
     for item in orders:
         visible = '' if item['visible'] else '[OFF]'
         pay_system = pay_systems.get_system_by_id(item['pay_system_id'])['name']
         symbol = item['symbol1'] if item['symbol2'] == None else item['symbol2']
+
         button_sign = '{} {}, {}-{}, {} {}'.format(
                                             visible,
                                             pay_system,
@@ -40,25 +36,25 @@ def show_admin(bot, update, user_data):
 
         keyboard.append([InlineKeyboardButton(button_sign, callback_data='admin setup_order {}'.format(item['id']))])
 
-    keyboard.append([InlineKeyboardButton(texts.back_, callback_data='trade cancel'), InlineKeyboardButton(texts.add_, callback_data='admin create_order')])
+    keyboard.append([InlineKeyboardButton(texts.back_, callback_data='trade cancel'),
+                    InlineKeyboardButton(texts.add_, callback_data='admin create_order')])
 
-    update.callback_query.message.edit_text(
+    message = texts.advs_msg_.format(240000)
+
+    info['message'].edit_text(
         message,
-        reply_markup=InlineKeyboardMarkup(keyboard),
-        parse_mode=ParseMode.MARKDOWN
+        reply_markup=InlineKeyboardMarkup(keyboard)
     )
 
-def query_route(bot, update, user_data):
-    query = update.callback_query
-    data = query.data.split()[1]
+@info
+def query_route(info, bot, update, user_data):
+    user_data.setdefault(info['message'].message_id, { 'page' : 0 })
 
-    user_data.setdefault(query.message.message_id, { 'page' : 0 })
-
-    if data == 'my_orders':
+    if info['data'][1] == 'my_orders':
         show_admin(bot, update, user_data)
-    elif data == 'cancel':
+    elif info['data'][1] == 'cancel':
         trade.show_trade(bot, update)
-    elif data == 'create_order':
-        create.create_order(bot, update, user_data)
-    elif data == 'setup_order':
+    elif info['data'][1] == 'create_order':
+        return create.create_order(bot, update, user_data)
+    elif info['data'][1] == 'setup_order':
         setup.setup_order(bot, update, user_data)

@@ -3,14 +3,15 @@ from telegram import (ReplyKeyboardMarkup, ReplyKeyboardRemove, ParseMode, Inlin
 from telegram.ext import (Updater, ConversationHandler, RegexHandler, CommandHandler, MessageHandler,
                         Filters, CallbackQueryHandler)
 import texts
-from database import payments
+from database import payments, users
 
-MENU, WITHDRAW = range(2)
-menu_keyboard = [['💰 Кошелек', '📊 Купить/продать BTC'], ['ℹ О сервисе', '🔩 Настройки']]
+MENU, WITHDRAW, CHOOSE_TYPE, PAY_SYSTEM, RATE, LIMMITS = range(6)
+menu_keyboard = [['💰 Кошелек', '📊 Купить/продать'], ['ℹ О сервисе', '🔩 Настройки']]
 
-def check_address(bot, update, user_data):
+@info
+def check_address(info, bot, update, user_data):
     print ('checking address')
-    address = update.message.text
+    address = info['message'].text
 
     #check address for mistakes
 
@@ -19,33 +20,35 @@ def check_address(bot, update, user_data):
     #return WITHDRAW
 
     #if ok, return to WITHDRAW and check for amount
-    update.message.reply_text(texts.chk_addr_ok_)
+    info['message'].reply_text(texts.chk_addr_ok_)
     user_data['checking_address'] = False
 
     return WITHDRAW
 
-def check_balance(bot, update, user_data):
+@info
+def check_balance(info, bot, update, user_data):
     #check for valid input
     try:
-        sum_to_withdraw = float(update.message.text)
+        sum_to_withdraw = float(info['message'].text)
         if sum_to_withdraw <= 0:
             raise Exception
     except:
-        update.message.reply_text(texts.incorrect_input_)
+        info['message'].reply_text(texts.incorrect_input_)
         return False
 
     #check if user have enough funds
-    if payments.withdraw_money(update.message.from_user.id, sum_to_withdraw):
+    if payments.withdraw_money(info['tg_id'], sum_to_withdraw):
         return True
 
-    update.message.reply_text(texts.low_funds_)
+    info['message'].reply_text(texts.low_funds_)
     return False
 
 
 def get_address(user_id):
     return 'btc address for user should be here'
 
-def withdraw(bot, update, user_data):
+@info
+def withdraw(info, bot, update, user_data):
 
     #print (user_data)
 
@@ -56,7 +59,7 @@ def withdraw(bot, update, user_data):
     #check sum
     if check_balance(bot, update, user_data):
         message = texts.chk_sum_ok_
-        update.message.reply_text(message, reply_markup=ReplyKeyboardMarkup(menu_keyboard))
+        info['message'].reply_text(message, reply_markup=ReplyKeyboardMarkup(menu_keyboard))
 
         user_data.pop('checking_address')
         #send money to withdraw address of user

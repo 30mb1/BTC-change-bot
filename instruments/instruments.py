@@ -3,39 +3,35 @@ from telegram import (ReplyKeyboardMarkup, ReplyKeyboardRemove, ParseMode, Inlin
 import texts
 from instruments import settings
 
-MENU, WITHDRAW = range(2)
+MENU, WITHDRAW, CHOOSE_TYPE, PAY_SYSTEM, RATE, LIMMITS = range(6)
 
-def show_instruments(bot, update, user_data):
-
+@info
+def show_instruments(info, bot, update, user_data):
     keyboard = [[InlineKeyboardButton(texts.choose_fiat_, callback_data='settings choose_fiat from_settings'),
                 InlineKeyboardButton(texts.choose_crypto_, callback_data='settings choose_crypto from_settings')]]
 
     message = texts.settings_msg_
 
     if update.callback_query:
-        update.callback_query.message.edit_text(
+        info['message'].edit_text(
             message,
-            reply_markup=InlineKeyboardMarkup(keyboard),
-            parse_mode=ParseMode.MARKDOWN
+            reply_markup=InlineKeyboardMarkup(keyboard)
         )
         return
 
-    update.message.reply_text(
+    info['message'].reply_text(
         message,
-        reply_markup=InlineKeyboardMarkup(keyboard),
-        parse_mode=ParseMode.MARKDOWN
+        reply_markup=InlineKeyboardMarkup(keyboard)
     )
 
-def query_route(bot, update, user_data):
-    query = update.callback_query
-    data = query.data.split()[1]
-
-    if data == 'set_fiat' or data == 'set_crypto':
+@info
+def query_route(info, bot, update, user_data):
+    if info['data'][1] == 'set_fiat' or info['data'][1] == 'set_crypto':
         settings.set_currency(bot, update, user_data)
-    if data == 'choose_crypto' or data == 'choose_fiat':
+    if info['data'][1] == 'choose_crypto' or info['data'][1] == 'choose_fiat':
         settings.choose_currency(bot, update, user_data)
-    elif data == 'cancel':
+    elif info['data'][1] == 'cancel':
         show_instruments(bot, update, user_data)
 
-def about_us(bot, update):
+def about_us(bot, update, user_data):
     update.message.reply_text('This section is in progress')

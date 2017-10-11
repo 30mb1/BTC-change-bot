@@ -6,29 +6,6 @@ import logging
 logger = logging.getLogger('Main')
 
 @connect
-def register_user(cursor, data):
-
-    query = "INSERT INTO user (tg_id, phone, username, first_name, last_name, post_stamp, lang, base_fiat_currency_id, base_currency_id) VALUES ({}, '{}', '{}', '{}', '{}', '{}', '{}');"
-    query = query.format(
-                        data['id'],
-                        data.get('phone', None),
-                        data.get('username', None),
-                        data.get('first_name', None),
-                        data.get('last_name', None),
-                        datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S'),
-                        'en',
-                        2,
-                        1
-                    )
-
-    try:
-        cursor.execute(query)
-
-    except:
-        logger.info('User {} {} {} with id {} already registered.'.format(data.get('username', None), data.get('last_name', None), data.get('first_name', None), data.get('id', None)))
-
-
-@connect
 def get_user_by_tgid(cursor, tg_id):
 
     query = "SELECT * FROM user WHERE tg_id = {}".format(tg_id)
@@ -38,6 +15,44 @@ def get_user_by_tgid(cursor, tg_id):
     out = cursor.fetchone()
 
     return {'id' : out[0], 'phone' : out[2], 'username' : out[3], 'first_name' : out[4], 'last_name' : out[5], 'lang' : out[6], 'base_fiat_currency_id' : out[8], 'base_currency_id' : out[9]}
+
+@connect
+def register_user(cursor, data):
+    cur_time = datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S')
+
+    query = "INSERT INTO user (tg_id, phone, username, first_name, last_name, post_stamp, lang, base_fiat_currency_id, base_currency_id) VALUES ('{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}');"
+    query = query.format(
+                        data['id'],
+                        data.get('phone', None),
+                        data.get('username', None),
+                        data.get('first_name', None),
+                        data.get('last_name', None),
+                        cur_time,
+                        'en',
+                        2,
+                        1
+                    )
+
+    try:
+        cursor.execute(query)
+
+    except Exception as e:
+        logger.warning(e)
+        logger.info('User {} {} {} with id {} already registered.'.format(data.get('username', None), data.get('last_name', None), data.get('first_name', None), data.get('id', None)))
+        return
+
+    #create accounts for user currencies
+    query = "INSERT INTO account (user_id, currency_id, balance, post_stamp) VALUES ('{}', '{}', '{}', '{}');"
+
+    user_id = get_user_by_tgid(data['id'])['id']
+    query = query.format(user_id, 1, 0, cur_time)
+
+    try:
+        cursor.execute(query)
+
+    except Exception as e:
+        logger.warning(e)
+
 
 @connect
 def get_user_by_usid(cursor, user_id):
@@ -50,17 +65,16 @@ def get_user_by_usid(cursor, user_id):
     return {'id' : out[0], 'phone' : out[2], 'username' : out[3], 'first_name' : out[4], 'last_name' : out[5], 'lang' : out[6], 'base_fiat_currency_id' : out[8], 'base_currency_id' : out[9]}
 
 @connect
-def get_user_balance(cursor, tg_id):
-
+def get_user_account(cursor, tg_id):
     user = get_user_by_tgid(tg_id)
 
-    query = "SELECT balance FROM account WHERE user_id = {}".format(user['id'])
+    query = "SELECT * FROM account WHERE user_id = {} and currency_id = {}".format(user['id'], user['base_currency_id'])
 
     cursor.execute(query)
 
     output = cursor.fetchone()
 
-    return output[0]
+    return { 'id' : output[0], 'user_id' : output[1], 'currency_id' : output[2], 'balance' : output[3], 'post_stamp' : output[4] }
 
 @connect
 def get_user_orders(cursor, tg_id, type_):

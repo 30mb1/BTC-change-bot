@@ -9,8 +9,12 @@ logger = logging.getLogger('Main')
 @connect
 def withdraw_money(cursor, tg_id, amount):
     user = users.get_user_by_tgid(tg_id)
-
-    query = "UPDATE account SET balance = balance - {} WHERE id = {} AND balance >= {};".format(amount, user['id'], amount)
+    query = "UPDATE account SET balance = balance - {} WHERE user_id = {} AND balance >= {} AND currency_id = {};".format(
+                                                                                                                        amount,
+                                                                                                                        user['id'],
+                                                                                                                        amount,
+                                                                                                                        user['base_currency_id']
+                                                                                                                    )
 
     cursor.execute(query)
 

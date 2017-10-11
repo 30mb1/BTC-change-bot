@@ -9,18 +9,20 @@ from telegram.ext.dispatcher import run_async
 from wallet import wallet as w
 from trade import trade as t
 from instruments import instruments as i
-import router
+import admin as a
+import utils
 from bitcoin import transfer
 import gettext
 import texts
 from database import users
 from ast import literal_eval
+import json
 
 
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO)
 logger = logging.getLogger('Main')
 
-MENU, WITHDRAW = range(2)
+MENU, WITHDRAW, CHOOSE_TYPE, PAY_SYSTEM, RATE, LIMMITS = range(6)
 
 menu_keyboard = [['💰 Кошелек', '📊 Купить/продать'], ['ℹ О сервисе', '🔩 Настройки']]
 
@@ -39,8 +41,7 @@ def start(bot, update, user_data):
     #gettext.install('messages', './locale')
     message = texts.start_
 
-    #print (literal_eval(update.message.from_user.to_json()))
-    users.register_user(literal_eval(update.message.from_user.to_json()))
+    users.register_user(json.loads(update.message.from_user.to_json()))
 
     update.message.reply_text(message, reply_markup=ReplyKeyboardMarkup(menu_keyboard))
 
@@ -68,18 +69,39 @@ def main():
             #regular expression for all languages should be here.
             MENU : [
                 RegexHandler('^(💰 Кошелек)$', w.show_wallet, pass_user_data=True),
-                RegexHandler('^(📊 Купить/продать)$', t.show_trade),
+                RegexHandler('^(📊 Купить/продать)$', t.show_trade, pass_user_data=True),
                 RegexHandler('^(🔩 Настройки)$', i.show_instruments, pass_user_data=True),
-                RegexHandler('^(ℹ О сервисе)$', i.about_us)
+                RegexHandler('^(ℹ О сервисе)$', i.about_us, pass_user_data=True)
             ],
 
             WITHDRAW : [
-                RegexHandler('Отмена', cancel, pass_user_data=True),
+                RegexHandler('^(Отмена)$', cancel, pass_user_data=True),
+                MessageHandler(Filters.text, transfer.withdraw, pass_user_data=True)
+            ],
+
+            #states for creating new order
+            CHOOSE_TYPE : [
+                RegexHandler('^(Отмена)$', cancel, pass_user_data=True),
+                MessageHandler(Filters.text, a.create.get_type, pass_user_data=True)
+            ],
+
+            PAY_SYSTEM : [
+                RegexHandler('^(Назад)$', a.create.create_order, pass_user_data=True),
+                MessageHandler(Filters.text, a.create.get_pay_system, pass_user_data=True)
+            ],
+
+            RATE : [
+                RegexHandler('^(Назад)$', a.create.get_type, pass_user_data=True),
+                MessageHandler(Filters.text, a.create.get_rate, pass_user_data=True)
+            ],
+
+            LIMMITS : [
+                RegexHandler('^(Назад)$', a.create.get_pay_system, pass_user_data=True),
                 MessageHandler(Filters.text, transfer.withdraw, pass_user_data=True)
             ]
         },
 
-        fallbacks=[CallbackQueryHandler(router.query_route, pass_user_data=True)],
+        fallbacks=[CallbackQueryHandler(utils.query_route, pass_user_data=True)],
         allow_reentry=True
     )
 

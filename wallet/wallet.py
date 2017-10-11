@@ -1,50 +1,37 @@
 from telegram import (ReplyKeyboardMarkup, ReplyKeyboardRemove, ParseMode, InlineKeyboardButton,
-                    InlineKeyboardMarkup, ParseMode)
+                    InlineKeyboardMarkup)
 from telegram.ext import Updater, ConversationHandler, RegexHandler, CommandHandler, MessageHandler, Filters
 from bitcoin import transfer
 import texts
 from database import users
+from utils import info
 
-MENU, WITHDRAW = range(2)
+MENU, WITHDRAW, CHOOSE_TYPE, PAY_SYSTEM, RATE, LIMMITS = range(6)
 
-
-def show_wallet(bot, update, user_data):
+@info
+def show_wallet(info, bot, update, user_data):
     keyboard = [
         [InlineKeyboardButton(texts.deposit_, callback_data='wallet deposit'),
         InlineKeyboardButton(texts.withdraw_, callback_data='wallet withdraw')]
     ]
     #_ = user_data['lang']
-    message = texts.wallet_msg_.format(users.get_user_balance(update.message.from_user.id), 254000)
+    message = texts.wallet_msg_.format(users.get_user_account(update.effective_user.id)['balance'], 254000)
 
-    update.message.reply_text(
+    info['message'].reply_text(
         message,
-        reply_markup=InlineKeyboardMarkup(keyboard),
-        parse_mode=ParseMode.MARKDOWN
+        reply_markup=InlineKeyboardMarkup(keyboard)
     )
 
-def query_route(bot, update, user_data):
-    query = update.callback_query
-    data = query.data.split()[1]
-
-    if data == 'withdraw':
+@info
+def query_route(info, bot, update, user_data):
+    if info['data'][1] == 'withdraw':
         message = texts.withdraw_msg_
-        bot.send_message(
-            chat_id=query.message.chat_id,
+        info['message'].reply_text(
             text=message,
-            reply_markup=ReplyKeyboardMarkup([[texts.cancel_]]),
-            parse_mode=ParseMode.MARKDOWN
+            reply_markup=ReplyKeyboardMarkup([[texts.cancel_]])
         )
         return WITHDRAW
     else:
         message = texts.deposit_msg_
-
-        bot.send_message(
-            chat_id=query.message.chat_id,
-            text=message,
-            parse_mode=ParseMode.MARKDOWN
-        )
-        bot.send_message(
-            chat_id=query.message.chat_id,
-            text="*{}*".format(transfer.get_address(query.message.from_user.id)),
-            parse_mode=ParseMode.MARKDOWN
-        )
+        info['message'].reply_text(text=message)
+        info['message'].reply_text(text="*{}*".format(transfer.get_address(info['tg_id'])))

@@ -53,7 +53,10 @@ def get_currency_by_id(cursor, cur_id):
 
     res = cursor.fetchone()
 
-    return { 'id' : res[0], 'type' : res[1], 'symbol' : res[2], 'name' : res[3], 'alias' : res[4], 'description' : res[5] }
+    return {
+                'id' : res[0], 'type' : res[1], 'symbol' : res[2],
+                'name' : res[3], 'alias' : res[4], 'description' : res[5]
+            }
 
 @connect
 def get_order_by_id(cursor, order_id):
@@ -63,7 +66,12 @@ def get_order_by_id(cursor, order_id):
 
     res = cursor.fetchone()
 
-    return { 'id' : res[0], 'user_id' : res[1], 'base_currency_id' : res[2], 'ref_currency_id' : res[3], 'rate' : res[4], 'min' : res[5], 'max' : res[6], 'message' : res[7], 'pay_system_id' : res[8], 'visible' : res[9] }
+    return {
+                'id' : res[0], 'user_id' : res[1], 'base_currency_id' : res[2],
+                'ref_currency_id' : res[3], 'rate' : res[4], 'min' : res[5],
+                'max' : res[6], 'message' : res[7], 'pay_system_id' : res[8],
+                'visible' : res[9]
+            }
 
 @connect
 def get_currencies_of_type(cursor, type_):
@@ -74,3 +82,24 @@ def get_currencies_of_type(cursor, type_):
     currency_list = cursor.fetchall()
 
     return [{ 'id' : cur[0], 'alias' : cur[4] } for cur in currency_list]
+
+@connect
+def get_available_pay_systems(cursor, tg_id, trade_data):
+    #return only pay systems where user doesn't already has order
+    user = users.get_user_by_tgid(tg_id)
+
+    query = ("SELECT name FROM `pay_system` WHERE id NOT IN (SELECT pay_system_id FROM"
+             " `order` WHERE user_id = {} AND base_currency_id = {} AND ref_currency_id"
+             " = {}) AND currency_id = {};")
+    query = query.format(
+                    user['id'],
+                    trade_data['base_currency_id'],
+                    trade_data['ref_currency_id'],
+                    user['base_fiat_currency_id']
+                )
+
+    cursor.execute(query)
+
+    available_pay_systems = cursor.fetchall()
+
+    return [system_name[0] for system_name in available_pay_systems]

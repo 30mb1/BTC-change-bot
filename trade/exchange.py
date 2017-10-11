@@ -8,31 +8,31 @@ from decimal import *
 
 PAGE_SIZE = 3
 
-MENU, WITHDRAW = range(2)
+MENU, WITHDRAW, CHOOSE_TYPE, PAY_SYSTEM, RATE, LIMMITS = range(6)
 
-def show_pay_systems(bot, update, user_data):
-    msg_id = update.callback_query.message.message_id
-    data = update.callback_query.data.split()[1]
+@info
+def show_pay_systems(info, bot, update, user_data):
+    msg_id = info['message'].message_id
     page = user_data[msg_id]['page']
 
     #cryptocurrency selected ny user
-    user_currency_id = users.get_user_by_tgid(update.callback_query.from_user.id)['base_currency_id']
+    user_currency_id = users.get_user_by_tgid(info['tg_id'])['base_currency_id']
     user_currency = pay_systems.get_currency_by_id(user_currency_id)
 
     #we know base_fiat_currency for every user. Getting list of available methods for selected currency
-    systems = pay_systems.get_pay_systems_list(update.callback_query.from_user.id)
+    systems = pay_systems.get_pay_systems_list(info['tg_id'])
 
     paginated_systems = [systems[i:i + PAGE_SIZE] for i in range(0, len(systems), PAGE_SIZE)]
     #store only systems where advs are
 
     #checking which button was pressed bu the user
-    if data == 'next_systems':
+    if info['data'][1] == 'next_systems':
 
         #increase page counter for this message
         page = user_data[msg_id]['page'] = user_data[msg_id]['page'] + 1
         page = page % len(paginated_systems)
 
-    elif data == 'back_systems':
+    elif info['data'][1] == 'back_systems':
         page = user_data[msg_id]['page'] = user_data[msg_id]['page'] - 1
         page = page % len(paginated_systems)
 
@@ -40,6 +40,7 @@ def show_pay_systems(bot, update, user_data):
     message = texts.buy_text_ if user_data[msg_id]['trade'] == 'buy' else texts.sell_text_
     message = message.format(user_currency['name'], 240000)
 
+    keyboard = []
     if len(paginated_systems):
         keyboard = [[InlineKeyboardButton(item['name'], callback_data='trade system {}'.format(item['id']))] for item in paginated_systems[page]]
 
@@ -52,26 +53,24 @@ def show_pay_systems(bot, update, user_data):
 
     #using 'trade' in callback data for simplificaion of routing callback queries
 
-    update.callback_query.message.edit_text(
+    info['message'].edit_text(
         message,
-        reply_markup=InlineKeyboardMarkup(keyboard),
-        parse_mode=ParseMode.MARKDOWN
+        reply_markup=InlineKeyboardMarkup(keyboard)
     )
 
-def show_system_orders(bot, update, user_data):
-    msg_id = update.callback_query.message.message_id
-    data = update.callback_query.data.split()
+@info
+def show_system_orders(info, bot, update, user_data):
+    msg_id = info['message'].message_id
 
-    trend = data[1]
-    pay_system_id = data[2]
-
+    trend = info['data'][1]
+    pay_system_id = info['data'][2]
 
     buy = 0 if user_data[msg_id]['trade'] == 'buy' else 1
 
-    user_currency_id = users.get_user_by_tgid(update.callback_query.from_user.id)['base_currency_id']
+    user_currency_id = users.get_user_by_tgid(info['tg_id'])['base_currency_id']
     user_currency = pay_systems.get_currency_by_id(user_currency_id)
 
-    orders = pay_systems.get_orders_for_system(update.callback_query.from_user.id, buy, pay_system_id)
+    orders = pay_systems.get_orders_for_system(info['tg_id'], buy, pay_system_id)
 
     paginated_orders = [orders[i:i + PAGE_SIZE] for i in range(0, len(orders), PAGE_SIZE)]
 
@@ -117,16 +116,14 @@ def show_system_orders(bot, update, user_data):
             keyboard.append([InlineKeyboardButton(button_sign, callback_data='trade show_order {}'.format(i['id']))])
 
     #manually adding next/cancel/back row of buttons
+    #using 'trade' in callback data for simplificaion of routing callback queries
     keyboard.append(
         [InlineKeyboardButton(texts.back_, callback_data='trade back_orders {}'.format(pay_system_id)),
         InlineKeyboardButton(texts.cancel_, callback_data='trade {}'.format(user_data[msg_id]['trade'])),
         InlineKeyboardButton(texts.next_, callback_data='trade next_orders {}'.format(pay_system_id))]
     )
 
-    #using 'trade' in callback data for simplificaion of routing callback queries
-
-    update.callback_query.message.edit_text(
+    info['message'].edit_text(
         message,
-        reply_markup=InlineKeyboardMarkup(keyboard),
-        parse_mode=ParseMode.MARKDOWN
+        reply_markup=InlineKeyboardMarkup(keyboard)
     )
