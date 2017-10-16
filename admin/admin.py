@@ -1,7 +1,6 @@
-from telegram import (ReplyKeyboardMarkup, ReplyKeyboardRemove, ParseMode, InlineKeyboardButton,
-                    InlineKeyboardMarkup, ParseMode)
+from telegram import ReplyKeyboardMarkup, InlineKeyboardButton, InlineKeyboardMarkup
 import texts
-from database import users, pay_systems
+from database import *
 from admin import create, setup
 from instruments import settings
 from trade import trade
@@ -53,8 +52,6 @@ def query_route(info, bot, update, user_data):
 
     if info['data'][1] == 'my_orders':
         show_admin(bot, update, user_data)
-    elif info['data'][1] == 'cancel':
-        trade.show_trade(bot, update)
     elif info['data'][1] == 'create_order':
         return create.create_order(bot, update, user_data)
     elif info['data'][1] == 'setup_order':

@@ -1,11 +1,8 @@
-from telegram import (ReplyKeyboardMarkup, ReplyKeyboardRemove, ParseMode, InlineKeyboardButton,
-                    InlineKeyboardMarkup, ParseMode)
+from telegram import ReplyKeyboardMarkup, InlineKeyboardButton, InlineKeyboardMarkup
 import texts
-from database import users, pay_systems
-from admin import create, setup, admin
+from database import *
+from admin import admin
 from instruments import instruments
-from trade import trade
-from decimal import *
 from utils.decorators import info
 
 #this constant defines number of buttons on a row in inline keyboard

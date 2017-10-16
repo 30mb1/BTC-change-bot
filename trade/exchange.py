@@ -1,8 +1,6 @@
-from telegram import (ReplyKeyboardMarkup, ReplyKeyboardRemove, ParseMode, InlineKeyboardButton,
-                    InlineKeyboardMarkup, ParseMode)
-import bitcoin
+from telegram import ReplyKeyboardMarkup, InlineKeyboardButton, InlineKeyboardMarkup
 import texts
-from database import pay_systems, users
+from database import *
 from decimal import *
 from utils.decorators import info
 

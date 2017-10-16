@@ -1,7 +1,7 @@
 from telegram import (ReplyKeyboardMarkup, ReplyKeyboardRemove, ParseMode, InlineKeyboardButton,
                     InlineKeyboardMarkup, ParseMode)
 import texts
-from database import users, pay_systems
+from database import *
 from decimal import *
 from utils.decorators import info
 

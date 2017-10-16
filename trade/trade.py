@@ -1,9 +1,7 @@
-from telegram import (ReplyKeyboardMarkup, ReplyKeyboardRemove, ParseMode, InlineKeyboardButton,
-                    InlineKeyboardMarkup, ParseMode)
+from telegram import ReplyKeyboardMarkup, InlineKeyboardButton, InlineKeyboardMarkup
 import texts
 from trade import exchange, orders
-from admin import admin
-from database import pay_systems, users
+from database import *
 from utils.decorators import info
 
 MENU, WITHDRAW, CHOOSE_TYPE, PAY_SYSTEM, RATE, LIMMITS = range(6)

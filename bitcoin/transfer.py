@@ -1,9 +1,6 @@
-from telegram import (ReplyKeyboardMarkup, ReplyKeyboardRemove, ParseMode, InlineKeyboardButton,
-                    InlineKeyboardMarkup, ParseMode)
-from telegram.ext import (Updater, ConversationHandler, RegexHandler, CommandHandler, MessageHandler,
-                        Filters, CallbackQueryHandler)
+from telegram import ReplyKeyboardMarkup, InlineKeyboardButton, InlineKeyboardMarkup
 import texts
-from database import payments, users
+from database import *
 from utils.decorators import info
 
 MENU, WITHDRAW, CHOOSE_TYPE, PAY_SYSTEM, RATE, LIMMITS = range(6)

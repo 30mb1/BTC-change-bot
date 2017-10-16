@@ -1,8 +1,7 @@
 import mysql.connector
-from database import connect
+from database import connect, users
 from datetime import datetime
 import logging
-from database import users
 
 logger = logging.getLogger('Main')
 

@@ -1,8 +1,7 @@
 import mysql.connector
-from database import connect
+from database import connect, users
 from datetime import datetime
 import logging
-from database import users
 
 @connect
 def get_pay_systems_list(cursor, tg_id):

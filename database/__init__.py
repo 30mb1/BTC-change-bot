@@ -1,6 +1,8 @@
 import mysql.connector
 from configparser import ConfigParser
 
+__all__ = ["pay_systems", "payments", "users"]
+
 
 parser = ConfigParser()
 parser.read('config.ini')
