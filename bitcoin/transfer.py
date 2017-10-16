@@ -4,6 +4,7 @@ from telegram.ext import (Updater, ConversationHandler, RegexHandler, CommandHan
                         Filters, CallbackQueryHandler)
 import texts
 from database import payments, users
+from utils.decorators import info
 
 MENU, WITHDRAW, CHOOSE_TYPE, PAY_SYSTEM, RATE, LIMMITS = range(6)
 menu_keyboard = [['💰 Кошелек', '📊 Купить/продать'], ['ℹ О сервисе', '🔩 Настройки']]

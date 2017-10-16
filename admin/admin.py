@@ -6,6 +6,7 @@ from admin import create, setup
 from instruments import settings
 from trade import trade
 from decimal import *
+from utils.decorators import info
 
 @info
 def show_admin(info, bot, update, user_data):

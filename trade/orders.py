@@ -3,6 +3,7 @@ from telegram import (ReplyKeyboardMarkup, ReplyKeyboardRemove, ParseMode, Inlin
 import texts
 from database import users, pay_systems
 from decimal import *
+from utils.decorators import info
 
 @info
 def show_order(info, bot, update, user_data):

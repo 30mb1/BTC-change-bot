@@ -6,7 +6,9 @@ from admin import create, setup, admin
 from instruments import instruments
 from trade import trade
 from decimal import *
+from utils.decorators import info
 
+#this constant defines number of buttons on a row in inline keyboard
 ROW_SIZE = 4
 
 @info

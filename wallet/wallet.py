@@ -4,7 +4,7 @@ from telegram.ext import Updater, ConversationHandler, RegexHandler, CommandHand
 from bitcoin import transfer
 import texts
 from database import users
-from utils import info
+from utils.decorators import info
 
 MENU, WITHDRAW, CHOOSE_TYPE, PAY_SYSTEM, RATE, LIMMITS = range(6)
 

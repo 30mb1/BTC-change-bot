@@ -10,13 +10,12 @@ from wallet import wallet as w
 from trade import trade as t
 from instruments import instruments as i
 import admin as a
-import utils
 from bitcoin import transfer
 import gettext
 import texts
 from database import users
-from ast import literal_eval
 import json
+from utils.router import query_route
 
 
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO)
@@ -101,7 +100,7 @@ def main():
             ]
         },
 
-        fallbacks=[CallbackQueryHandler(utils.query_route, pass_user_data=True)],
+        fallbacks=[CallbackQueryHandler(query_route, pass_user_data=True)],
         allow_reentry=True
     )
 

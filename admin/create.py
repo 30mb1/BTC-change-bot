@@ -3,6 +3,7 @@ from telegram import (ReplyKeyboardMarkup, ReplyKeyboardRemove, ParseMode, Inlin
 import texts
 from database import users, pay_systems
 from decimal import *
+from utils.decorators import info
 
 MENU, WITHDRAW, CHOOSE_TYPE, PAY_SYSTEM, RATE, LIMMITS = range(6)
 

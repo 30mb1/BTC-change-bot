@@ -2,9 +2,9 @@ from telegram import (ReplyKeyboardMarkup, ReplyKeyboardRemove, ParseMode, Inlin
                     InlineKeyboardMarkup, ParseMode)
 import bitcoin
 import texts
-from trade import trade
 from database import pay_systems, users
 from decimal import *
+from utils.decorators import info
 
 PAGE_SIZE = 3
 

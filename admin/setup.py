@@ -3,6 +3,7 @@ from telegram import (ReplyKeyboardMarkup, ReplyKeyboardRemove, ParseMode, Inlin
 import texts
 from database import users, pay_systems
 from decimal import *
+from utils.decorators import info
 
 
 def setup_order(bot, update, user_data):

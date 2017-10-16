@@ -2,6 +2,7 @@ from telegram import (ReplyKeyboardMarkup, ReplyKeyboardRemove, ParseMode, Inlin
                     InlineKeyboardMarkup, ParseMode)
 import texts
 from instruments import settings
+from utils.decorators import info
 
 MENU, WITHDRAW, CHOOSE_TYPE, PAY_SYSTEM, RATE, LIMMITS = range(6)
 
@@ -12,7 +13,7 @@ def show_instruments(info, bot, update, user_data):
 
     message = texts.settings_msg_
 
-    if update.callback_query:
+    if info['callback']:
         info['message'].edit_text(
             message,
             reply_markup=InlineKeyboardMarkup(keyboard)
