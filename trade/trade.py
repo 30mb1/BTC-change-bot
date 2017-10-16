@@ -7,7 +7,7 @@ from utils.decorators import info
 MENU, WITHDRAW, CHOOSE_TYPE, PAY_SYSTEM, RATE, LIMMITS = range(6)
 
 @info
-def show_trade(info, bot, update, user_data):
+def show_trade(_, info, bot, update, user_data):
     keyboard = [
         [InlineKeyboardButton("Buy 📈", callback_data='trade buy'),
         InlineKeyboardButton("Sell 📉", callback_data='trade sell'),
@@ -30,21 +30,21 @@ def show_trade(info, bot, update, user_data):
     info['message'].reply_text(message, reply_markup=InlineKeyboardMarkup(keyboard))
 
 @info
-def query_route(info, bot, update, user_data):
+def query_route(_, info, bot, update, user_data):
     user_data.setdefault(info['message'].message_id, { 'page' : 0 })
 
     if info['data'][1] == 'buy' or info['data'][1] == 'sell':
         user_data[info['message'].message_id]['trade'] = info['data'][1]
-        exchange.show_pay_systems(bot, update, user_data)
+        exchange.show_pay_systems(bot, update, user_data=user_data)
     elif info['data'][1] == 'next_systems' or info['data'][1] == 'back_systems':
-        exchange.show_pay_systems(bot, update, user_data)
+        exchange.show_pay_systems(bot, update, user_data=user_data)
     elif info['data'][1] == 'system':
         user_data[info['message'].message_id]['page'] = 0
-        exchange.show_system_orders(bot, update, user_data)
+        exchange.show_system_orders(bot, update, user_data=user_data)
     elif info['data'][1] == 'next_orders' or info['data'][1] == 'back_orders':
-        exchange.show_system_orders(bot, update, user_data)
+        exchange.show_system_orders(bot, update, user_data=user_data)
     elif info['data'][1] == 'show_order':
-        orders.show_order(bot, update, user_data)
+        orders.show_order(bot, update, user_data=user_data)
     elif info['data'][1] == 'cancel':
         user_data.pop(info['message'].message_id, None)
-        show_trade(bot, update, user_data)
+        show_trade(bot, update, user_data=user_data)

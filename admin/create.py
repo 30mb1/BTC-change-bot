@@ -7,7 +7,7 @@ from utils.decorators import info
 MENU, WITHDRAW, CHOOSE_TYPE, PAY_SYSTEM, RATE, LIMMITS = range(6)
 
 @info
-def create_order(info, bot, update, user_data):
+def create_order(_, info, bot, update, user_data):
     currency_id = users.get_user_by_tgid(info['tg_id'])['base_currency_id']
     currency = pay_systems.get_currency_by_id(currency_id)
 
@@ -20,7 +20,7 @@ def create_order(info, bot, update, user_data):
     return CHOOSE_TYPE
 
 @info
-def get_type(info, bot, update, user_data):
+def get_type(_, info, bot, update, user_data):
     message_text = info['message'].text
 
     user = users.get_user_by_tgid(info['tg_id'])
@@ -57,7 +57,7 @@ def get_type(info, bot, update, user_data):
     return PAY_SYSTEM
 
 @info
-def get_pay_system(info, bot, update, user_data):
+def get_pay_system(_, info, bot, update, user_data):
     message_text = info['message'].text
 
     if message_text in user_data['create_order']['available_systems']:
@@ -73,5 +73,5 @@ def get_pay_system(info, bot, update, user_data):
     return RATE
 
 @info
-def get_rate(info, bot, update, user_data):
+def get_rate(_, info, bot, update, user_data):
     return

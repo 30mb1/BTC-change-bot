@@ -9,7 +9,7 @@ PAGE_SIZE = 3
 MENU, WITHDRAW, CHOOSE_TYPE, PAY_SYSTEM, RATE, LIMMITS = range(6)
 
 @info
-def show_pay_systems(info, bot, update, user_data):
+def show_pay_systems(_, info, bot, update, user_data):
     msg_id = info['message'].message_id
     page = user_data[msg_id]['page']
 
@@ -57,7 +57,7 @@ def show_pay_systems(info, bot, update, user_data):
     )
 
 @info
-def show_system_orders(info, bot, update, user_data):
+def show_system_orders(_, info, bot, update, user_data):
     msg_id = info['message'].message_id
 
     trend = info['data'][1]

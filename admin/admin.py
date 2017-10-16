@@ -8,7 +8,7 @@ from decimal import *
 from utils.decorators import info
 
 @info
-def show_admin(info, bot, update, user_data):
+def show_admin(_, info, bot, update, user_data):
     buy_orders = users.get_user_orders(info['tg_id'], 'crypto')
     sell_orders = users.get_user_orders(info['tg_id'], 'fiat')
 
@@ -47,12 +47,12 @@ def show_admin(info, bot, update, user_data):
     )
 
 @info
-def query_route(info, bot, update, user_data):
+def query_route(_, info, bot, update, user_data):
     user_data.setdefault(info['message'].message_id, { 'page' : 0 })
 
     if info['data'][1] == 'my_orders':
-        show_admin(bot, update, user_data)
+        show_admin(bot, update, user_data=user_data)
     elif info['data'][1] == 'create_order':
-        return create.create_order(bot, update, user_data)
+        return create.create_order(bot, update, user_data=user_data)
     elif info['data'][1] == 'setup_order':
-        setup.setup_order(bot, update, user_data)
+        setup.setup_order(bot, update, user_data=user_data)

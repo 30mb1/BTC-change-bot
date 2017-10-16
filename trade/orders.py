@@ -5,7 +5,7 @@ from decimal import *
 from utils.decorators import info
 
 @info
-def show_order(info, bot, update, user_data):
+def show_order(_, info, bot, update, user_data):
     order_id = info['data'][2]
 
     order = pay_systems.get_order_by_id(order_id)
