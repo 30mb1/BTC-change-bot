@@ -28,8 +28,10 @@ def show_instruments(_, info, bot, update, user_data):
 def query_route(_, info, bot, update, user_data):
     if info['data'][1] == 'set_fiat' or info['data'][1] == 'set_crypto':
         settings.set_currency(bot, update, user_data=user_data)
+
     if info['data'][1] == 'choose_crypto' or info['data'][1] == 'choose_fiat':
         settings.choose_currency(bot, update, user_data=user_data)
+        
     elif info['data'][1] == 'cancel':
         show_instruments(bot, update, user_data=user_data)
 

@@ -41,11 +41,12 @@ def register_user(cursor, data):
         logger.info('User {} {} {} with id {} already registered.'.format(data.get('username', None), data.get('last_name', None), data.get('first_name', None), data.get('id', None)))
         return
 
-    #create accounts for user currencies
-    query = "INSERT INTO account (user_id, currency_id, balance, post_stamp) VALUES ('{}', '{}', '{}', '{}');"
+    #create accounts for currencies (LTC, BTC, ETH)
+    query = "INSERT INTO account (user_id, currency_id, balance, post_stamp) VALUES ('{}', '{}', '{}', '{}'),('{}', '{}', '{}', '{}'),('{}', '{}', '{}', '{}') "
 
+    # 1, 6, 7 are id of btc ltc and eth in db. Should be changed
     user_id = get_user_by_tgid(data['id'])['id']
-    query = query.format(user_id, 1, 0, cur_time)
+    query = query.format(user_id, 1, 0, cur_time, user_id, 6, 0, cur_time, user_id, 7, 0, cur_time)
 
     try:
         cursor.execute(query)

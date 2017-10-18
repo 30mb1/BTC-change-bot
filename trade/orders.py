@@ -8,6 +8,7 @@ from utils.decorators import info
 def show_order(_, info, bot, update, user_data):
     order_id = info['data'][2]
 
+    # get all info about this order
     order = pay_systems.get_order_by_id(order_id)
 
     user = users.get_user_by_usid(order['user_id'])

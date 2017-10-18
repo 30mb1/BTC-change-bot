@@ -29,6 +29,7 @@ def show_trade(_, info, bot, update, user_data):
 
     info['message'].reply_text(message, reply_markup=InlineKeyboardMarkup(keyboard))
 
+#determine ehat to do using callback data
 @info
 def query_route(_, info, bot, update, user_data):
     user_data.setdefault(info['message'].message_id, { 'page' : 0 })
@@ -37,15 +38,20 @@ def query_route(_, info, bot, update, user_data):
         user_data[info['message'].message_id]['page'] = 0
         user_data[info['message'].message_id]['trade'] = info['data'][1]
         exchange.show_pay_systems(bot, update, user_data=user_data)
+
     elif info['data'][1] == 'next_systems' or info['data'][1] == 'back_systems':
         exchange.show_pay_systems(bot, update, user_data=user_data)
+
     elif info['data'][1] == 'system':
         user_data[info['message'].message_id]['page'] = 0
         exchange.show_system_orders(bot, update, user_data=user_data)
+
     elif info['data'][1] == 'next_orders' or info['data'][1] == 'back_orders':
         exchange.show_system_orders(bot, update, user_data=user_data)
+
     elif info['data'][1] == 'show_order':
         orders.show_order(bot, update, user_data=user_data)
+        
     elif info['data'][1] == 'cancel':
         user_data.pop(info['message'].message_id, None)
         show_trade(bot, update, user_data=user_data)

@@ -4,6 +4,7 @@ from admin import admin as a
 from instruments import instruments as i
 from utils.decorators import info
 
+#detect ehat function to use using callback data
 @info
 def query_route(_, info, bot, update, user_data):
     if 'wallet' in info['data']:
