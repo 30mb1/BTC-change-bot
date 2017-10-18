@@ -9,15 +9,15 @@ MENU, WITHDRAW, CHOOSE_TYPE, PAY_SYSTEM, RATE, LIMMITS = range(6)
 @info
 def show_trade(_, info, bot, update, user_data):
     keyboard = [
-        [InlineKeyboardButton("Buy 📈", callback_data='trade buy'),
-        InlineKeyboardButton("Sell 📉", callback_data='trade sell'),
-        InlineKeyboardButton(texts.my_advs_, callback_data='admin my_orders buy')]
+        [InlineKeyboardButton(_(texts.buy_button_), callback_data='trade buy'),
+        InlineKeyboardButton(_(texts.sell_button_), callback_data='trade sell'),
+        InlineKeyboardButton(_(texts.my_advs_), callback_data='admin my_orders buy')]
     ]
 
     currency_id = users.get_user_by_tgid(info['tg_id'])['base_currency_id']
     currency = pay_systems.get_currency_by_id(currency_id)
 
-    message = texts.trade_msg_.format(currency['name'], currency['name'], 240000) + 'RUB'
+    message = _(texts.trade_msg_).format(currency['name'], currency['name'], 240000) + 'RUB'
 
     if info['callback']:
 

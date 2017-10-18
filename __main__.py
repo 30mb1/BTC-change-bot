@@ -25,7 +25,6 @@ MENU, WITHDRAW, CHOOSE_TYPE, PAY_SYSTEM, RATE, LIMMITS = range(6)
 menu_keyboard = [['💰 Кошелек', '📊 Купить/продать'], ['ℹ О сервисе', '🔩 Настройки']]
 
 
-
 def error_callback(bot, update, error):
     try:
         raise error
@@ -34,8 +33,6 @@ def error_callback(bot, update, error):
 
 
 def start(bot, update, user_data):
-    #user_data['ru'] = gettext.translation('messages', localedir='./locale', languages=['ru'])
-    #user_data['en'] = gettext.translation('messages', localedir='./locale', languages=['en'])
     user_data['lang'] = 'ru'
     #gettext.install('messages', './locale')
     message = texts.start_
@@ -48,6 +45,7 @@ def start(bot, update, user_data):
 
 
 def cancel(bot, update, user_data):
+    # delete all temporary data except user language
     lang = user_data['lang']
     user_data.clear()
     user_data['lang'] = lang

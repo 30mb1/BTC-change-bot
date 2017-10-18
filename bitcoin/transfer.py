@@ -30,14 +30,14 @@ def check_balance(_, info, bot, update, user_data):
         if sum_to_withdraw <= 0:
             raise Exception
     except:
-        info['message'].reply_text(texts.incorrect_input_)
+        info['message'].reply_text(_(texts.incorrect_input_))
         return False
 
     #check if user have enough funds
     if payments.withdraw_money(info['tg_id'], sum_to_withdraw):
         return True
 
-    info['message'].reply_text(texts.low_funds_)
+    info['message'].reply_text(_(texts.low_funds_))
     return False
 
 def get_address(user_id):
@@ -55,7 +55,7 @@ def withdraw(_, info, bot, update, user_data):
 
     #check sum
     if check_balance(bot, update, user_data=user_data):
-        message = texts.chk_sum_ok_
+        message = _(texts.chk_sum_ok_)
         info['message'].reply_text(message, reply_markup=ReplyKeyboardMarkup(menu_keyboard))
 
         user_data.pop('checking_address')

@@ -36,7 +36,7 @@ def show_pay_systems(_, info, bot, update, user_data):
 
     #choosing appropriate message
     message = texts.buy_text_ if user_data[msg_id]['trade'] == 'buy' else texts.sell_text_
-    message = message.format(user_currency['name'], 240000)
+    message = _(message).format(user_currency['name'], 240000)
 
     keyboard = []
     if len(paginated_systems):
@@ -44,9 +44,9 @@ def show_pay_systems(_, info, bot, update, user_data):
 
     #manually adding next/cancel/back row of buttons
     keyboard.append(
-        [InlineKeyboardButton(texts.back_, callback_data='trade back_systems'),
-        InlineKeyboardButton(texts.cancel_, callback_data='trade cancel'),
-        InlineKeyboardButton(texts.next_, callback_data='trade next_systems')]
+        [InlineKeyboardButton(_(texts.back_), callback_data='trade back_systems'),
+        InlineKeyboardButton(_(texts.cancel_), callback_data='trade cancel'),
+        InlineKeyboardButton(_(texts.next_), callback_data='trade next_systems')]
     )
 
     #using 'trade' in callback data for simplificaion of routing callback queries
@@ -89,7 +89,7 @@ def show_system_orders(_, info, bot, update, user_data):
     system_name = pay_systems.get_system_by_id(pay_system_id)['name']
 
     message = texts.buy_list_ if user_data[msg_id]['trade'] == 'buy' else texts.sell_list_
-    message = message.format(user_currency['name'], len(orders), system_name)
+    message = _(message).format(user_currency['name'], len(orders), system_name)
 
     #get symbol of fiat currency for selected pay_system
     currency_id = pay_systems.get_system_by_id(pay_system_id)['currency_id']
@@ -116,9 +116,9 @@ def show_system_orders(_, info, bot, update, user_data):
     #manually adding next/cancel/back row of buttons
     #using 'trade' in callback data for simplificaion of routing callback queries
     keyboard.append(
-        [InlineKeyboardButton(texts.back_, callback_data='trade back_orders {}'.format(pay_system_id)),
-        InlineKeyboardButton(texts.cancel_, callback_data='trade {}'.format(user_data[msg_id]['trade'])),
-        InlineKeyboardButton(texts.next_, callback_data='trade next_orders {}'.format(pay_system_id))]
+        [InlineKeyboardButton(_(texts.back_), callback_data='trade back_orders {}'.format(pay_system_id)),
+        InlineKeyboardButton(_(texts.cancel_), callback_data='trade {}'.format(user_data[msg_id]['trade'])),
+        InlineKeyboardButton(_(texts.next_), callback_data='trade next_orders {}'.format(pay_system_id))]
     )
 
     info['message'].edit_text(

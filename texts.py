@@ -1,6 +1,7 @@
 def _(message):
     return message
 
+# _() function for gettext translation
 start_ = _("Some start message")
 
 canceled_ = _('Отменено')
@@ -26,6 +27,10 @@ settings_msg_  = _("*🔩 Настройки*\n\nЗдесь вы можете и
 about_ = _("ℹ О сервисе")
 
 buy_ = _('Покупка ({})')
+
+buy_button_ = _("Купить 📈")
+
+sell_button_ = _("продать 📉")
 
 sell_ = _('Продажа ({})')
 

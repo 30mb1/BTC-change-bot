@@ -13,10 +13,10 @@ def show_admin(_, info, bot, update, user_data):
     sell_orders = users.get_user_orders(info['tg_id'], 'fiat')
 
     #manually add choose crypto/fiat currency buttons, buy_orders button and sell_orders button.
-    keyboard = [[InlineKeyboardButton(texts.choose_fiat_, callback_data='settings choose_fiat from_admin'),
-                InlineKeyboardButton(texts.choose_crypto_, callback_data='settings choose_crypto from_admin')],
-                [InlineKeyboardButton(texts.buy_.format(len(buy_orders)), callback_data='admin my_orders buy'),
-                InlineKeyboardButton(texts.sell_.format(len(sell_orders)), callback_data='admin my_orders sell')]
+    keyboard = [[InlineKeyboardButton(_(texts.choose_fiat_), callback_data='settings choose_fiat from_admin'),
+                InlineKeyboardButton(_(texts.choose_crypto__, callback_data='settings choose_crypto from_admin')],
+                [InlineKeyboardButton(_(texts.buy_).format(len(buy_orders)), callback_data='admin my_orders buy'),
+                InlineKeyboardButton(_(texts.sell_).format(len(sell_orders)), callback_data='admin my_orders sell')]
             ]
 
     orders = buy_orders if info['data'][2] == 'buy' else sell_orders
@@ -36,10 +36,10 @@ def show_admin(_, info, bot, update, user_data):
 
         keyboard.append([InlineKeyboardButton(button_sign, callback_data='admin setup_order {}'.format(item['id']))])
 
-    keyboard.append([InlineKeyboardButton(texts.back_, callback_data='trade cancel'),
-                    InlineKeyboardButton(texts.add_, callback_data='admin create_order')])
+    keyboard.append([InlineKeyboardButton(_(texts.back_), callback_data='trade cancel'),
+                    InlineKeyboardButton(_(texts.add_), callback_data='admin create_order')])
 
-    message = texts.advs_msg_.format(240000)
+    message = _(texts.advs_msg_).format(240000)
 
     info['message'].edit_text(
         message,

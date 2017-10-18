@@ -10,7 +10,7 @@ ROW_SIZE = 4
 
 @info
 def set_currency(_, info, bot, update, user_data):
-    #get currency type from set_crypto/set_fiat string in data
+    # get currency type from set_crypto/set_fiat string in data
     users.set_currency(info['tg_id'], info['data'][2], info['data'][1][4:])
     if info['data'][3] == 'from_admin':
         admin.show_admin(bot, update, user_data=user_data)
@@ -42,6 +42,6 @@ def choose_currency(_, info, bot, update, user_data):
     message = texts.fiat_msg_ if cur_type == 'fiat' else texts.crypto_msg
 
     info['message'].edit_text(
-        message,
+        _(message),
         reply_markup=InlineKeyboardMarkup(keyboard)
     )

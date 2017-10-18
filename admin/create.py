@@ -11,9 +11,9 @@ def create_order(_, info, bot, update, user_data):
     currency_id = users.get_user_by_tgid(info['tg_id'])['base_currency_id']
     currency = pay_systems.get_currency_by_id(currency_id)
 
-    keyboard = [[texts.buy_.format(currency['name'])], [texts.sell_.format(currency['name'])], [texts.cancel_]]
+    keyboard = [[_(texts.buy_).format(currency['name'])], [_(texts.sell_).format(currency['name'])], [_(texts.cancel_)]]
 
-    info['message'].reply_text(text=texts.adv_create_1_, reply_markup=ReplyKeyboardMarkup(keyboard))
+    info['message'].reply_text(text=_(texts.adv_create_1_), reply_markup=ReplyKeyboardMarkup(keyboard))
 
     #create temporary storage for new order data
     user_data['create_order'] = {}
@@ -28,8 +28,8 @@ def get_type(_, info, bot, update, user_data):
 
     #in order not to use regex, check user input manually
     #create input choices
-    buy = texts.buy_.format(currency['name'])
-    sell = texts.sell_.format(currency['name'])
+    buy = _(texts.buy_).format(currency['name'])
+    sell = _(texts.sell_).format(currency['name'])
 
     #compare user input and prepared choices and store result in user_data until the process is finished
     if message_text == buy:
@@ -38,19 +38,19 @@ def get_type(_, info, bot, update, user_data):
     elif message_text == sell:
         user_data['create_order']['base_currency_id'] = user['base_currency_id']
         user_data['create_order']['ref_currency_id'] = user['base_fiat_currency_id']
-    elif message_text == texts.back_:
+    elif message_text == _(texts.back_):
         #we already have chosen order type and just want to rechoose pay system
         pass
     else:
         #incorrect input
-        info['message'].reply_text(texts.incorrect_input_)
+        info['message'].reply_text(_(texts.incorrect_input_))
         return CHOOSE_TYPE
 
     available_pay_systems = pay_systems.get_available_pay_systems(info['tg_id'], user_data['create_order'])
     keyboard = [[pay_system] for pay_system in available_pay_systems]
-    keyboard.append([texts.back_])
+    keyboard.append([_(texts.back_)])
 
-    info['message'].reply_text(texts.adv_create_2_, reply_markup=ReplyKeyboardMarkup(keyboard))
+    info['message'].reply_text(_(texts.adv_create_2_), reply_markup=ReplyKeyboardMarkup(keyboard))
 
     #store list of available pay systems for checking input on next step.
     user_data['create_order']['available_systems'] = available_pay_systems
@@ -62,14 +62,14 @@ def get_pay_system(_, info, bot, update, user_data):
 
     if message_text in user_data['create_order']['available_systems']:
         user_data['create_order']['pay_system'] = message_text
-    elif message_text == texts.back_:
+    elif message_text == _(texts.back_):
         #we already have chosen pay_system and just want to rechoose rate
         pass
     else:
-        info['message'].reply_text(texts.incorrect_input_)
+        info['message'].reply_text(_(texts.incorrect_input_))
         return RATE
 
-    info['message'].reply_text(texts.adv_create_3_, reply_markup=ReplyKeyboardMarkup([[texts.back_]]))
+    info['message'].reply_text(_(texts.adv_create_3_), reply_markup=ReplyKeyboardMarkup([[_(texts.back_)]]))
     return RATE
 
 @info

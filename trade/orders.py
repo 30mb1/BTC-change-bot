@@ -22,9 +22,9 @@ def show_order(_, info, bot, update, user_data):
     user_currency = pay_systems.get_currency_by_id(user_currency_id)
 
     if user_data[info['message'].message_id]['trade'] == 'buy':
-        message = texts.buy_order_
+        message = _(texts.buy_order_)
     else:
-        message = texts.sell_order_
+        message = _(texts.sell_order_)
 
     message = message.format(
             user_currency['name'],
@@ -40,8 +40,8 @@ def show_order(_, info, bot, update, user_data):
             fiat_cur['alias']
         )
 
-    keyboard = [[InlineKeyboardButton(texts.cancel_, callback_data='trade system {}'.format(order['pay_system_id'])),
-                InlineKeyboardButton(texts.start_deal_, callback_data='trade start_deal {}'.format(order_id))]]
+    keyboard = [[InlineKeyboardButton(_(texts.cancel_), callback_data='trade system {}'.format(order['pay_system_id'])),
+                InlineKeyboardButton(_(texts.start_deal_), callback_data='trade start_deal {}'.format(order_id))]]
 
     info['message'].edit_text(
         message,

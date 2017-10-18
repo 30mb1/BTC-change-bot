@@ -10,7 +10,7 @@ def show_instruments(_, info, bot, update, user_data):
     keyboard = [[InlineKeyboardButton(texts.choose_fiat_, callback_data='settings choose_fiat from_settings'),
                 InlineKeyboardButton(texts.choose_crypto_, callback_data='settings choose_crypto from_settings')]]
 
-    message = texts.settings_msg_
+    message = _(texts.settings_msg_)
 
     if info['callback']:
         info['message'].edit_text(

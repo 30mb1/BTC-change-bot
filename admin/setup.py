@@ -5,6 +5,6 @@ from database import *
 from decimal import *
 from utils.decorators import info
 
-
-def setup_order(bot, update, user_data):
+@info
+def setup_order(_, info, bot, update, user_data):
     pass
