@@ -14,7 +14,7 @@ def show_admin(_, info, bot, update, user_data):
 
     #manually add choose crypto/fiat currency buttons, buy_orders button and sell_orders button.
     keyboard = [[InlineKeyboardButton(_(texts.choose_fiat_), callback_data='settings choose_fiat from_admin'),
-                InlineKeyboardButton(_(texts.choose_crypto__, callback_data='settings choose_crypto from_admin')],
+                InlineKeyboardButton(_(texts.choose_crypto_), callback_data='settings choose_crypto from_admin')],
                 [InlineKeyboardButton(_(texts.buy_).format(len(buy_orders)), callback_data='admin my_orders buy'),
                 InlineKeyboardButton(_(texts.sell_).format(len(sell_orders)), callback_data='admin my_orders sell')]
             ]

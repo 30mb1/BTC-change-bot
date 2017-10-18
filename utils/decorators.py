@@ -18,13 +18,13 @@ def info(func):
         extracted_info['chat_id'] = update.effective_chat.id
         extracted_info['message'] = update.effective_message
         extracted_info['callback'] = False
-        
+
         if update.callback_query:
             extracted_info['callback'] = True
             extracted_info['data'] = update.callback_query.data.split()
 
         # determine user language and use appropriate translate function
-        print (kwargs, args)
+        #print (kwargs, args)
         translation_func = LANGS[kwargs['user_data']['lang']]
         res = func(translation_func, extracted_info, *args, **kwargs)
 

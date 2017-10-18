@@ -14,7 +14,7 @@ def show_wallet(_, info, bot, update, user_data):
     ]
 
     #254000 is temporary value, later real data from exchnges will be inserted
-    message = _(texts.wallet_msg_).format(users.get_user_account(update.effective_user.id)['balance'], 254000)
+    message = _(texts.wallet_msg_).format(users.get_user_account(info['tg_id'])['balance'], 254000)
 
     info['message'].reply_text(
         message,

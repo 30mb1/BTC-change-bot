@@ -34,6 +34,7 @@ def query_route(_, info, bot, update, user_data):
     user_data.setdefault(info['message'].message_id, { 'page' : 0 })
 
     if info['data'][1] == 'buy' or info['data'][1] == 'sell':
+        user_data[info['message'].message_id]['page'] = 0
         user_data[info['message'].message_id]['trade'] = info['data'][1]
         exchange.show_pay_systems(bot, update, user_data=user_data)
     elif info['data'][1] == 'next_systems' or info['data'][1] == 'back_systems':
