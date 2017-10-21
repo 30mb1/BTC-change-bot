@@ -29,7 +29,7 @@ def show_trade(_, info, bot, update, user_data):
 
     info['message'].reply_text(message, reply_markup=InlineKeyboardMarkup(keyboard))
 
-#determine ehat to do using callback data
+#determine what to do using callback data
 @info
 def query_route(_, info, bot, update, user_data):
     user_data.setdefault(info['message'].message_id, { 'page' : 0 })
@@ -51,7 +51,7 @@ def query_route(_, info, bot, update, user_data):
 
     elif info['data'][1] == 'show_order':
         orders.show_order(bot, update, user_data=user_data)
-        
+
     elif info['data'][1] == 'cancel':
         user_data.pop(info['message'].message_id, None)
         show_trade(bot, update, user_data=user_data)
