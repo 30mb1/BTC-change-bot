@@ -36,11 +36,13 @@ mysql -u <user> -p < database.sql
 
 Bot is still in development.
 
-### How it is work
+### Some details
+
+- Bot store all temporary information in object called user_data - dictionary, unique for every user. Information about messages state(for example page in list of orders and etc.), choosed language and other data.
 
 - Bot use [this](https://github.com/python-telegram-bot/python-telegram-bot) library for work.
 
-- Bot supports localization via gettext. All texts that bot use are stored in texts.py file. To create new localization file, generate .po file using texts.py, moderate it and compile. Then place compiled .mo file in an appropriate folder in */locale*. Insert translation function in utils/decorators.py in LANGS variable, so @info decorator would provide it to all bot functions. (section for choosing language is not created yet)
+- Bot supports localization via gettext. All texts that bot use are stored in texts.py file. To create new localization file, generate .po file using texts.py, moderate it and compile. Then place compiled .mo file in an appropriate folder in */locale*. Insert translation function in utils/decorators.py in LANGS variable, so @info decorator would provide it to all bot functions. (function for choosing language is not created yet)
 
 - When inline button is pressed, bot get special callback update, which contains callback_data. It usually has next structure:
 
@@ -50,10 +52,8 @@ Bot is still in development.
 
 ### To do:
 
+- create function for choosing language and create appropriate interface element
 - develop trade process - at the moment nothing happens when pressing button 'start bargain'
 - complete 'create new bargain' process
 - develop mechanism of getting prices from exchanges - values are hardcoded now
 - connect nodes to bot - there is no real work with currencies at the moment. Need to create wallets for clients and develop exchange mechanism
-
- 
-
