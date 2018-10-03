@@ -4,7 +4,7 @@ from datetime import datetime
 import logging
 
 @connect
-def get_pay_systems_list(cursor, tg_id):
+def get_pay_systems_list(cursor, tg_id, **kwargs):
     user = users.get_user_by_tgid(tg_id)
 
     query = "SELECT name, id FROM pay_system WHERE currency_id = {};".format(user['base_fiat_currency_id'])
@@ -16,7 +16,7 @@ def get_pay_systems_list(cursor, tg_id):
     return [{'name' : i[0], 'id' : i[1]} for i in systems_list]
 
 @connect
-def get_system_by_id(cursor, id_):
+def get_system_by_id(cursor, id_, **kwargs):
     query = "SELECT * FROM pay_system WHERE id = {};".format(id_)
 
     cursor.execute(query)
@@ -26,7 +26,18 @@ def get_system_by_id(cursor, id_):
     return { 'id' : res[0], 'name' : res[1], 'currency_id' : res[2] }
 
 @connect
-def get_orders_for_system(cursor, tg_id, buy, system_id):
+def get_system_by_name(cursor, name_, **kwargs):
+    query = "SELECT * FROM pay_system WHERE name = '{}';".format(name_)
+
+    cursor.execute(query)
+
+    res = cursor.fetchone()
+
+    return { 'id' : res[0], 'name' : res[1], 'currency_id' : res[2] }
+
+
+@connect
+def get_orders_for_system(cursor, tg_id, buy, system_id, **kwargs):
     user = users.get_user_by_tgid(tg_id)
 
     reverse = ''
@@ -45,7 +56,7 @@ def get_orders_for_system(cursor, tg_id, buy, system_id):
     return [{'id' : i[0], 'user_id' : i[1], 'rate' : i[4], 'min' : i[5], 'max' : i[6], 'message' : i[7]} for i in orders_list]
 
 @connect
-def get_currency_by_id(cursor, cur_id):
+def get_currency_by_id(cursor, cur_id, **kwargs):
     query = "SELECT * FROM currency WHERE id = {};".format(cur_id)
 
     cursor.execute(query)
@@ -58,7 +69,7 @@ def get_currency_by_id(cursor, cur_id):
             }
 
 @connect
-def get_order_by_id(cursor, order_id):
+def get_order_by_id(cursor, order_id, **kwargs):
     query = "SELECT * FROM `order` WHERE id = {};".format(order_id)
 
     cursor.execute(query)
@@ -73,7 +84,7 @@ def get_order_by_id(cursor, order_id):
             }
 
 @connect
-def get_currencies_of_type(cursor, type_):
+def get_currencies_of_type(cursor, type_, **kwargs):
     query = "SELECT * FROM currency WHERE type ='{}'".format(type_)
 
     cursor.execute(query)
@@ -83,7 +94,7 @@ def get_currencies_of_type(cursor, type_):
     return [{ 'id' : cur[0], 'alias' : cur[4] } for cur in currency_list]
 
 @connect
-def get_available_pay_systems(cursor, tg_id, trade_data):
+def get_available_pay_systems(cursor, tg_id, trade_data, **kwargs):
     #return only pay systems where user doesn't already has order
     user = users.get_user_by_tgid(tg_id)
 

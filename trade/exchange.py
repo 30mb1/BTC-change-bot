@@ -79,12 +79,14 @@ def show_system_orders(_, info, bot, update, user_data):
 
         #increase page counter for this message
         page = user_data[msg_id]['page'] = user_data[msg_id]['page'] + 1
-        page = page % len(paginated_orders)
+        if len(paginated_orders) != 0:
+            page = page % len(paginated_orders)
 
 
     elif trend == 'back_orders':
         page = user_data[msg_id]['page'] = user_data[msg_id]['page'] - 1
-        page = page % len(paginated_orders)
+        if len(paginated_orders) != 0:
+            page = page % len(paginated_orders)
 
     system_name = pay_systems.get_system_by_id(pay_system_id)['name']
 

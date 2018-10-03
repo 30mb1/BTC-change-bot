@@ -20,7 +20,7 @@ from utils.router import query_route
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO)
 logger = logging.getLogger('Main')
 
-MENU, WITHDRAW, CHOOSE_TYPE, PAY_SYSTEM, RATE, LIMMITS = range(6)
+MENU, WITHDRAW, CHOOSE_TYPE, PAY_SYSTEM, RATE, LIMMITS, DESCRIPTION = range(7)
 
 menu_keyboard = [['💰 Кошелек', '📊 Купить/продать'], ['ℹ О сервисе', '🔩 Настройки']]
 
@@ -94,6 +94,11 @@ def main():
                 MessageHandler(Filters.text, a.create.get_rate, pass_user_data=True)
             ],
 
+            DESCRIPTION : [
+                RegexHandler('^(Назад)$', a.create.get_pay_system, pass_user_data=True),
+                MessageHandler(Filters.text, a.create.get_description, pass_user_data=True)
+            ],
+
             LIMMITS : [
                 RegexHandler('^(Назад)$', a.create.get_pay_system, pass_user_data=True),
                 MessageHandler(Filters.text, transfer.withdraw, pass_user_data=True)
@@ -107,7 +112,7 @@ def main():
 
     dispatcher.add_handler(main_menu)
     updater.start_polling()
-    updater.idle()
+    # updater.idle()
 
 if __name__ == '__main__':
     main()

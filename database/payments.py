@@ -6,7 +6,7 @@ import logging
 logger = logging.getLogger('Main')
 
 @connect
-def withdraw_money(cursor, tg_id, amount):
+def withdraw_money(cursor, tg_id, amount, **kwargs):
     user = users.get_user_by_tgid(tg_id)
     query = "UPDATE account SET balance = balance - {} WHERE user_id = {} AND balance >= {} AND currency_id = {};".format(
                                                                                                                         amount,

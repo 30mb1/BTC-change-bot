@@ -3,8 +3,11 @@ import texts
 from database import *
 from decimal import *
 from utils.decorators import info
+import re
 
-MENU, WITHDRAW, CHOOSE_TYPE, PAY_SYSTEM, RATE, LIMMITS = range(6)
+MENU, WITHDRAW, CHOOSE_TYPE, PAY_SYSTEM, RATE, LIMMITS, DESCRIPTION = range(7)
+menu_keyboard = [['💰 Кошелек', '📊 Купить/продать'], ['ℹ О сервисе', '🔩 Настройки']]
+
 
 @info
 def create_order(_, info, bot, update, user_data):
@@ -67,11 +70,45 @@ def get_pay_system(_, info, bot, update, user_data):
         pass
     else:
         info['message'].reply_text(_(texts.incorrect_input_))
-        return RATE
+        return PAY_SYSTEM
 
     info['message'].reply_text(_(texts.adv_create_3_), reply_markup=ReplyKeyboardMarkup([[_(texts.back_)]]))
     return RATE
 
 @info
 def get_rate(_, info, bot, update, user_data):
-    return
+    message_text = info['message'].text
+
+    if message_text == _(texts.back_):
+        info['message'].reply_text(_(texts.adv_create_4_), reply_markup=ReplyKeyboardMarkup([[_(texts.back_)]]))
+        return DESCRIPTION
+    else:
+        try:
+            price = int(message_text)
+            user_data['create_order']['rate'] = price
+            print (price)
+            info['message'].reply_text(_(texts.adv_create_4_), reply_markup=ReplyKeyboardMarkup([[_(texts.back_)]]))
+            return DESCRIPTION
+        except Exception as e:
+            price = re.match('(?:\d+)', message_text)
+            if price:
+                price = price.group(0)
+                price = int(240000 * (price / 100))
+                user_data['create_order']['rate'] = price
+                print (price)
+                info['message'].reply_text(_(texts.adv_create_4_), reply_markup=ReplyKeyboardMarkup([[_(texts.back_)]]))
+                return DESCRIPTION
+            info['message'].reply_text(_(texts.incorrect_input_))
+            return RATE
+
+@info
+def get_description(_, info, bot, update, user_data):
+    message_text = info['message'].text
+    user_ = users.get_user_by_tgid(info['tg_id'])
+
+    user_data['create_order']['message'] = message_text
+    order.create_order(user_['id'], user_data['create_order'])
+
+    update.message.reply_text(texts.adv_created, reply_markup=ReplyKeyboardMarkup(menu_keyboard))
+
+    return MENU

@@ -31,10 +31,10 @@ def query_route(_, info, bot, update, user_data):
 
     if info['data'][1] == 'choose_crypto' or info['data'][1] == 'choose_fiat':
         settings.choose_currency(bot, update, user_data=user_data)
-        
+
     elif info['data'][1] == 'cancel':
         show_instruments(bot, update, user_data=user_data)
 
 @info
-def about_us(_, bot, update, user_data):
-    update.message.reply_text('This section is in progress')
+def about_us(_, info, bot, update, user_data):
+    update.message.reply_text('BEST BOT FOR TRADING THIS WORLD HAS EVER SEEN')

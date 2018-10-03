@@ -6,7 +6,7 @@ import logging
 logger = logging.getLogger('Main')
 
 @connect
-def get_user_by_tgid(cursor, tg_id):
+def get_user_by_tgid(cursor, tg_id, **kwargs):
 
     query = "SELECT * FROM user WHERE tg_id = {}".format(tg_id)
 
@@ -17,7 +17,7 @@ def get_user_by_tgid(cursor, tg_id):
     return {'id' : out[0], 'phone' : out[2], 'username' : out[3], 'first_name' : out[4], 'last_name' : out[5], 'lang' : out[6], 'base_fiat_currency_id' : out[8], 'base_currency_id' : out[9]}
 
 @connect
-def register_user(cursor, data):
+def register_user(cursor, data, cnx, **kwargs):
     cur_time = datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S')
 
     query = "INSERT INTO user (tg_id, phone, username, first_name, last_name, post_stamp, lang, base_fiat_currency_id, base_currency_id) VALUES ('{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}');"
@@ -35,6 +35,7 @@ def register_user(cursor, data):
 
     try:
         cursor.execute(query)
+        cnx.commit()
 
     except Exception as e:
         logger.warning(e)
@@ -56,7 +57,7 @@ def register_user(cursor, data):
 
 
 @connect
-def get_user_by_usid(cursor, user_id):
+def get_user_by_usid(cursor, user_id, **kwargs):
     query = "SELECT * FROM user WHERE id = {}".format(user_id)
 
     cursor.execute(query)
@@ -66,7 +67,7 @@ def get_user_by_usid(cursor, user_id):
     return {'id' : out[0], 'phone' : out[2], 'username' : out[3], 'first_name' : out[4], 'last_name' : out[5], 'lang' : out[6], 'base_fiat_currency_id' : out[8], 'base_currency_id' : out[9]}
 
 @connect
-def get_user_account(cursor, tg_id):
+def get_user_account(cursor, tg_id, **kwargs):
     user = get_user_by_tgid(tg_id)
 
     query = "SELECT * FROM account WHERE user_id = {} and currency_id = {}".format(user['id'], user['base_currency_id'])
@@ -74,11 +75,12 @@ def get_user_account(cursor, tg_id):
     cursor.execute(query)
 
     output = cursor.fetchone()
+    print (output)
 
     return { 'id' : output[0], 'user_id' : output[1], 'currency_id' : output[2], 'balance' : output[3], 'post_stamp' : output[4] }
 
 @connect
-def get_user_orders(cursor, tg_id, type_):
+def get_user_orders(cursor, tg_id, type_, **kwargs):
     user = get_user_by_tgid(tg_id)
 
     #select only rows when we buy crypt currencies
@@ -95,7 +97,7 @@ def get_user_orders(cursor, tg_id, type_):
     return [{ 'visible' : order[0], 'pay_system_id' : order[1], 'rate' : order[2], 'alias1' : order[3], 'symbol1' : order[4], 'symbol2' : order[6], 'id' : order[5], 'alias2' : order[7] } for order in orders_list]
 
 @connect
-def set_currency(cursor, tg_id, currency_id, type_):
+def set_currency(cursor, tg_id, currency_id, type_, **kwargs):
     if type_ == 'fiat':
         query = "UPDATE user SET base_fiat_currency_id = {} WHERE tg_id = {}".format(currency_id, tg_id)
     else:
