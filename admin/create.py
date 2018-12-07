@@ -93,7 +93,7 @@ def get_rate(_, info, bot, update, user_data):
             price = re.match('(?:\d+)', message_text)
             if price:
                 price = price.group(0)
-                price = int(240000 * (price / 100))
+                price = int(240000 * (int(price) / 100))
                 user_data['create_order']['rate'] = price
                 print (price)
                 info['message'].reply_text(_(texts.adv_create_4_), reply_markup=ReplyKeyboardMarkup([[_(texts.back_)]]))
