@@ -5,19 +5,20 @@ import logging
 
 logger = logging.getLogger('Main')
 
+
 @connect
 def withdraw_money(cursor, tg_id, amount, **kwargs):
     user = users.get_user_by_tgid(tg_id)
     query = "UPDATE account SET balance = balance - {} WHERE user_id = {} AND balance >= {} AND currency_id = {};".format(
-                                                                                                                        amount,
-                                                                                                                        user['id'],
-                                                                                                                        amount,
-                                                                                                                        user['base_currency_id']
-                                                                                                                    )
+        amount,
+        user['id'],
+        amount,
+        user['base_currency_id']
+    )
 
     cursor.execute(query)
 
-    #user have enough funds, row was updated
+    # user have enough funds, row was updated
     if cursor.rowcount:
         return True
 
