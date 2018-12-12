@@ -57,3 +57,4 @@ Bot is still in development.
 - complete 'create new bargain' process
 - develop mechanism of getting prices from exchanges - values are hardcoded now
 - connect nodes to bot - there is no real work with currencies at the moment. Need to create wallets for clients and develop exchange mechanism
+ 
