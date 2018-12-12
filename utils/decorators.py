@@ -3,8 +3,8 @@ import gettext
 
 
 LANGS = {
-    'ru' : texts._,
-    'en' : gettext.translation('messages', localedir='./locale', languages=['en']).gettext
+    'ru': texts._,
+    'en': gettext.translation('messages', localedir='./locale', languages=['en']).gettext
 }
 
 
