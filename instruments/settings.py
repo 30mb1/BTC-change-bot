@@ -5,8 +5,9 @@ from admin import admin
 from instruments import instruments
 from utils.decorators import info
 
-#this constant defines number of buttons on a row in inline keyboard
+# this constant defines number of buttons on a row in inline keyboard
 ROW_SIZE = 4
+
 
 @info
 def set_currency(_, info, bot, update, user_data):
@@ -17,9 +18,10 @@ def set_currency(_, info, bot, update, user_data):
     else:
         instruments.show_instruments(bot, update, user_data=user_data)
 
+
 @info
 def choose_currency(_, info, bot, update, user_data):
-    #get currency type from choose_fiat/choose_crypto string in data
+    # get currency type from choose_fiat/choose_crypto string in data
     cur_type = info['data'][1][7:]
 
     fiat_list = pay_systems.get_currencies_of_type(cur_type)
@@ -31,7 +33,8 @@ def choose_currency(_, info, bot, update, user_data):
     for row in fiat_row_list:
         button_row = []
         for cur in row:
-            button_row.append(InlineKeyboardButton(cur['alias'], callback_data='settings set_{} {} {}'.format(cur_type, cur['id'], info['data'][2])))
+            button_row.append(InlineKeyboardButton(
+                cur['alias'], callback_data='settings set_{} {} {}'.format(cur_type, cur['id'], info['data'][2])))
         keyboard.append(button_row)
 
     if info['data'][2] == 'from_admin':
